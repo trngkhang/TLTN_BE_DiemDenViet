@@ -39,3 +39,30 @@ export const signup = async (req, res, next) => {
     next(error);
   }
 };
+
+export const signin = async (req, res, next) => {
+  try {
+    const { username, password } = req.body;
+
+    const validUser = await User.findOne({ username: username });
+    if (!validUser) {
+      return next(errorHandler(400, "Username not found"));
+    }
+    const isMatch = await bcryptjs.compare(password, validUser.password);
+    if (!isMatch) {
+      return next(errorHandler(400, "Invalid password"));
+    }
+    const token = jwt.sign(
+      { id: validUser._id, isAdmin: validUser.isAdmin },
+      envVar.jwtSecret,
+      { expiresIn: "1h" }
+    );
+    const { password: pass, ...rest } = validUser._doc;
+    return res
+      .status(200)
+      .cookie("access_token", token, { httpOnly: true, expiresIn: "1h" })
+      .json(rest);
+  } catch (error) {
+    next(error);
+  }
+};
