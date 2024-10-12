@@ -1,4 +1,5 @@
 import { body, validationResult } from "express-validator";
+import { errorHandler } from "./errorHandler.js";
 
 export const validateSignup = [
   body("name")
@@ -49,10 +50,7 @@ export const validateSignup = [
   (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return res.status(400).json({
-        success: false,
-        errors: errors.array(),
-      });
+      return next(errorHandler(400, errors.array()[0].msg));
     }
     next();
   },

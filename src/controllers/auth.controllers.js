@@ -2,14 +2,15 @@ import User from "../models/user.models.js";
 import envVar from "../utils/envVariable.js";
 import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { errorHandler } from "../utils/errorHandler.js";
 
-export const signup = async (req, res) => {
+export const signup = async (req, res, next) => {
   try {
     const { name, username, password } = req.body;
 
     const user = await User.findOne({ username: username });
     if (user) {
-      return res.status(400).json("Username is already exits");
+      return next(errorHandler(400, "Username already exists"));
     }
     const salt = await bcryptjs.genSalt(10);
     const hashedPassword = await bcryptjs.hash(password, salt);
@@ -35,6 +36,6 @@ export const signup = async (req, res) => {
       })
       .json(rest);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    next(error);
   }
 };
