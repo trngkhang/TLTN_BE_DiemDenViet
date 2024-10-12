@@ -66,3 +66,14 @@ export const signin = async (req, res, next) => {
     next(error);
   }
 };
+
+export const signout = async (req, res, next) => {
+  try {
+    return res
+      .status(200)
+      .clearCookie("access_token")
+      .json("User has been sign out");
+  } catch (error) {
+    next(error);
+  }
+};
