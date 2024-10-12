@@ -3,13 +3,8 @@ import mongoose from "mongoose";
 const UserSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
-    basicAuth: {
-      username: { type: String },
-      password: { type: String },
-    },
-    googleAuth: {
-      UID: { type: String },
-    },
+    username: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
     avatar: {
       type: String,
       required: true,
@@ -25,13 +20,5 @@ const UserSchema = new mongoose.Schema(
   { timestamps: true, minimize: false, strict: false }
 );
 
-// Custom validation to require at least one authentication method
-UserSchema.pre("validate", function (next) {
-  if (!this.basicAuth.username && !this.googleAuth.UID) {
-    return next(new Error("User must have either basicAuth or googleAuth."));
-  }
-  next();
-});
-
-const User = mongoose.models.User || mongoose.model("User", UserSchema);
+const User = mongoose.model("User", UserSchema);
 export default User;
