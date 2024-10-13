@@ -13,7 +13,7 @@ export const validateSignup = [
     .isLength({ min: 3, max: 30 })
     .withMessage("Name must be between 3 and 30 characters long")
     .bail()
-    .matches(/^[a-zA-Z ]+$/)
+    .matches(/^[\p{L}0-9 ]+$/u)
     .withMessage("Name must contain only letters and spaces")
     .bail(),
 
@@ -85,6 +85,40 @@ export const validateSignin = [
     .bail()
     .matches(/^\S*$/)
     .withMessage("Password must not contain spaces")
+    .bail(),
+
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return next(errorHandler(400, errors.array()[0].msg));
+    }
+    next();
+  },
+];
+
+export const validatePostRegion = [
+  body("name")
+    .not()
+    .isEmpty()
+    .withMessage("Name must not be empty")
+    .bail()
+    .isString()
+    .withMessage("Name must be a string")
+    .bail()
+    .isLength({ min: 6, max: 50 })
+    .withMessage("Name must be between 6 and 50 characters long")
+    .bail()
+    .matches(/^[\p{L}0-9 ]+$/u)
+    .withMessage("Name must contain only letters and spaces")
+    .bail(),
+
+  body("description")
+    .not()
+    .isEmpty()
+    .withMessage("Descriptionmust not be empty")
+    .bail()
+    .isString()
+    .withMessage("Descriptionmust be a string")
     .bail(),
 
   (req, res, next) => {
