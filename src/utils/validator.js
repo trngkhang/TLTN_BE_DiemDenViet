@@ -1,4 +1,4 @@
-import { body, validationResult } from "express-validator";
+import { body, param, validationResult } from "express-validator";
 import { errorHandler } from "./errorHandler.js";
 
 export const validateSignup = [
@@ -119,6 +119,28 @@ export const validatePostRegion = [
     .bail()
     .isString()
     .withMessage("Descriptionmust be a string")
+    .bail(),
+
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return next(errorHandler(400, errors.array()[0].msg));
+    }
+    next();
+  },
+];
+
+export const validateGetRegionbyId = [
+  param("id")
+    .not()
+    .isEmpty()
+    .withMessage("Id must not be empty")
+    .bail()
+    .isString()
+    .withMessage("Id must be a string")
+    .bail()
+    .matches(/^[a-zA-Z0-9]+$/)
+    .withMessage("Id must not contain spaces or special characters")
     .bail(),
 
   (req, res, next) => {
