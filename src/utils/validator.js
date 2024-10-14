@@ -138,9 +138,61 @@ export const validateGetRegionbyId = [
     .bail()
     .isString()
     .withMessage("Id must be a string")
+    .isLength({ min: 24, max: 24 })
+    .withMessage("Name must be 24 characters long")
     .bail()
-    .matches(/^[a-zA-Z0-9]+$/)
+    .bail()
+    .matches(/^[a-f0-9]+$/)
     .withMessage("Id must not contain spaces or special characters")
+    .bail(),
+
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return next(errorHandler(400, errors.array()[0].msg));
+    }
+    next();
+  },
+];
+
+export const validatePostProvince = [
+  body("name")
+    .not()
+    .isEmpty()
+    .withMessage("Name must not be empty")
+    .bail()
+    .isString()
+    .withMessage("Name must be a string")
+    .bail()
+    .isLength({ min: 6, max: 50 })
+    .withMessage("Name must be between 6 and 50 characters long")
+    .bail()
+    .matches(/^[\p{L}0-9 ]+$/u)
+    .withMessage("Name must contain only letters and spaces")
+    .bail(),
+
+  body("description")
+    .not()
+    .isEmpty()
+    .withMessage("Descriptionmust not be empty")
+    .bail()
+    .isString()
+    .withMessage("Descriptionmust be a string")
+    .bail(),
+
+  body("regionId")
+    .not()
+    .isEmpty()
+    .withMessage("regionId must not be empty")
+    .bail()
+    .isString()
+    .withMessage("regionId must be a string")
+    .bail()
+    .isLength({ min: 24, max: 24 })
+    .withMessage("regionId must be 24 characters long")
+    .bail()
+    .matches(/^[a-f0-9]+$/)
+    .withMessage("Invalid regionId")
     .bail(),
 
   (req, res, next) => {
