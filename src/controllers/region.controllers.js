@@ -18,3 +18,17 @@ export const postRegion = async (req, res, next) => {
     next(error);
   }
 };
+
+export const getAllRegion = async (req, res, next) => {
+  try {
+    const regions = await Region.find({});
+    if (!regions) {
+      return next(errorHandler(404, "No regions found"));
+    }
+    const totalRegions = await Region.countDocuments();
+
+    return res.status(200).json({ totalRegions, regions });
+  } catch (error) {
+    next(error);
+  }
+};
