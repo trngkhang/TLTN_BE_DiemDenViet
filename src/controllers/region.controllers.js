@@ -45,3 +45,29 @@ export const getRegion = async (req, res, next) => {
     next(error);
   }
 };
+
+export const putRegion = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const region = await Region.findById(id);
+    if (!region) {
+      return next(errorHandler(404, "Region not found"));
+    }
+    const { name, description } = req.body;
+
+    const updateRegion = await Region.findByIdAndUpdate(
+      id,
+      {
+        name: name,
+        description: description,
+      },
+      { new: true }
+    );
+
+    return res
+      .status(200)
+      .json({ message: "Region has been update", updateRegion });
+  } catch (error) {
+    next(error);
+  }
+};
