@@ -8,10 +8,11 @@ import {
   validateGetRegionbyId,
   validatePostRegion,
 } from "../utils/validator.js";
+import { verifyAdmin } from "../utils/verifyToken.js";
 
 const router = express.Router();
 
-router.post("/", validatePostRegion, postRegion);
+router.post("/", verifyAdmin, validatePostRegion, postRegion);
 router.get("/", getAllRegion);
 router.get("/:id", validateGetRegionbyId, getRegion);
 
