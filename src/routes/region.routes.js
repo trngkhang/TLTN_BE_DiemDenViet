@@ -5,17 +5,14 @@ import {
   postRegion,
   putRegion,
 } from "../controllers/region.controllers.js";
-import {
-  validateGetRegionbyId,
-  validatePostRegion,
-} from "../utils/validator.js";
+import { validateId, validatePostRegion } from "../utils/validator.js";
 import { verifyAdmin } from "../utils/verifyToken.js";
 
 const router = express.Router();
 
 router.post("/", verifyAdmin, validatePostRegion, postRegion);
 router.get("/", getAllRegion);
-router.get("/:id", validateGetRegionbyId, getRegion);
+router.get("/:id", validateId, getRegion);
 router.put("/:id", verifyAdmin, validatePostRegion, putRegion);
 
 export default router;

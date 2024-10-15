@@ -19,7 +19,7 @@ export const postProvince = async (req, res, next) => {
   }
 };
 
-export const getProvince = async (req, res, next) => {
+export const getAllProvince = async (req, res, next) => {
   try {
     const provinces = await Province.find({});
 
@@ -29,6 +29,19 @@ export const getProvince = async (req, res, next) => {
     const totalProvinces = await Province.countDocuments();
 
     return res.status(200).json({ totalProvinces, provinces });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getProvince = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const province = await Province.findById(id);
+    if (!province) {
+      return next(errorHandler(404, "Province not found"));
+    }
+    return res.status(200).json(province);
   } catch (error) {
     next(error);
   }

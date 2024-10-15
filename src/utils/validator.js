@@ -130,7 +130,7 @@ export const validatePostRegion = [
   },
 ];
 
-export const validateGetRegionbyId = [
+export const validateId = [
   param("id")
     .not()
     .isEmpty()
@@ -139,7 +139,7 @@ export const validateGetRegionbyId = [
     .isString()
     .withMessage("Id must be a string")
     .isLength({ min: 24, max: 24 })
-    .withMessage("Name must be 24 characters long")
+    .withMessage("Id must be 24 characters long")
     .bail()
     .bail()
     .matches(/^[a-f0-9]+$/)
