@@ -47,3 +47,27 @@ export const getDestinationType = async (req, res, next) => {
     next(error);
   }
 };
+
+export const putDestinationType = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { name, description } = req.body;
+
+    const updatedDestinationType = await DestinationType.findByIdAndUpdate(
+      id,
+      {
+        name: name,
+        description: description,
+      },
+      { new: true }
+    );
+    if (!updatedDestinationType) {
+      return next(errorHandler(404, "Destination Type not found"));
+    }
+    return res
+      .status(200)
+      .json({ message: "Region has been update", updatedDestinationType });
+  } catch (error) {
+    next(error);
+  }
+};
