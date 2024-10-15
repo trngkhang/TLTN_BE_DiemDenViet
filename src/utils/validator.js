@@ -143,7 +143,7 @@ export const validateId = [
     .bail()
     .bail()
     .matches(/^[a-f0-9]+$/)
-    .withMessage("Id must not contain spaces or special characters")
+    .withMessage("Invalid Id")
     .bail(),
 
   (req, res, next) => {
