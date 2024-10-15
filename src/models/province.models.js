@@ -32,6 +32,26 @@ ProvinceSchema.pre("save", function (next) {
     })
     .catch((err) => next(err));
 });
+//Middleware pre-findOneAndUpdate: Kiểm tra sự tồn tại của regionId trước khi cập nhật
+ProvinceSchema.pre("findOneAndUpdate", function (next) {
+  const update = this.getUpdate();
+  if (update.regionId) {
+    mongoose
+      .model("Region")
+      .findById(update.regionId)
+      .then((province) => {
+        if (!province) {
+          // Nếu region không tồn tại, ngăn lưu province
+          return next(new Error("Region not found"));
+        }
+        // Nếu Region tồn tại, tiếp tục lưu
+        next();
+      })
+      .catch((err) => next(err));
+  } else {
+    next(); // không có author trong update, tiếp tục
+  }
+});
 
 const Province = mongoose.model("Province", ProvinceSchema);
 export default Province;

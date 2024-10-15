@@ -46,3 +46,25 @@ export const getProvince = async (req, res, next) => {
     next(error);
   }
 };
+
+export const putProvince = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { name, description, regionId } = req.body;
+    const updatedProvince = await Province.findByIdAndUpdate(
+      id,
+      {
+        name,
+        description,
+        regionId,
+      },
+      { new: true }
+    );
+    if (!updatedProvince) {
+      return next(errorHandler(404, "Province not found"));
+    }
+    return res.status(200).json(updatedProvince);
+  } catch (error) {
+    next(error);
+  }
+};

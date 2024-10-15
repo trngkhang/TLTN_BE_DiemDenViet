@@ -13,6 +13,6 @@ const router = express.Router();
 router.post("/", verifyAdmin, validatePostRegion, postRegion);
 router.get("/", getAllRegion);
 router.get("/:id", validateId, getRegion);
-router.put("/:id", verifyAdmin, validatePostRegion, putRegion);
+router.put("/:id", verifyAdmin, validateId, validatePostRegion, putRegion);
 
 export default router;
