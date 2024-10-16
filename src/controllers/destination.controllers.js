@@ -68,3 +68,45 @@ export const getDestination = async (req, res, next) => {
     next(error);
   }
 };
+
+export const putDestination = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const {
+      name,
+      image,
+      introduce,
+      description,
+      address,
+      openingTime,
+      ticketPrice,
+      provinceId,
+      destinationTypeId,
+    } = req.body;
+
+    const newDestination = await Destination.findByIdAndUpdate(
+      id,
+      {
+        ...(name && name),
+        ...(image && image),
+        ...(introduce && introduce),
+        ...(description && description),
+        ...(address && address),
+        ...(openingTime && openingTime),
+        ...(ticketPrice && ticketPrice),
+        ...(provinceId && provinceId),
+        ...(destinationTypeId && destinationTypeId),
+      },
+      { new: true }
+    );
+    if (!newDestination) {
+      return next(errorHandler(404, "Destination not found"));
+    }
+    return res.status(200).json({
+      message: "Destination has been updated",
+      newDestination,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
