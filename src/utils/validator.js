@@ -203,3 +203,82 @@ export const validatePostProvince = [
     next();
   },
 ];
+
+export const validatePostDestination = [
+  body("name")
+    .not()
+    .isEmpty()
+    .withMessage("Name must not be empty")
+    .bail()
+    .isString()
+    .withMessage("Name must be a string")
+    .bail()
+    .isLength({ min: 6, max: 100 })
+    .withMessage("Name must be between 6 and 100 characters long")
+    .bail()
+    .matches(/^[\p{L}0-9 ]+$/u)
+    .withMessage("Name must contain only letters and spaces")
+    .bail(),
+
+  body("image").isString().withMessage("Image be a string").bail(),
+
+  body("introduce")
+    .not()
+    .isEmpty()
+    .withMessage("Introduce must not be empty")
+    .isString()
+    .withMessage("Descriptionmust be a string")
+    .bail(),
+
+  body("description")
+    .isString()
+    .withMessage("Descriptionmust be a string")
+    .bail(),
+
+  body("address").bail().isString().withMessage("Address be a string").bail(),
+
+  body("openingTime").isString().withMessage("Opening Time be a string").bail(),
+
+  body("ticketPrice")
+    .isString()
+    .withMessage("Ticket price Time be a string")
+    .bail(),
+
+  body("provinceId")
+    .not()
+    .isEmpty()
+    .withMessage("Province id must not be empty")
+    .bail()
+    .isString()
+    .withMessage("Province id must be a string")
+    .isLength({ min: 24, max: 24 })
+    .withMessage("Province id must be 24 characters long")
+    .bail()
+    .bail()
+    .matches(/^[a-f0-9]+$/)
+    .withMessage("Invalid province id")
+    .bail(),
+
+  body("destinationTypeId")
+    .not()
+    .isEmpty()
+    .withMessage("Destination type id must not be empty")
+    .bail()
+    .isString()
+    .withMessage("Destination type id must be a string")
+    .isLength({ min: 24, max: 24 })
+    .withMessage("Destination type id must be 24 characters long")
+    .bail()
+    .bail()
+    .matches(/^[a-f0-9]+$/)
+    .withMessage("Invalid destination type id")
+    .bail(),
+
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return next(errorHandler(400, errors.array()[0].msg));
+    }
+    next();
+  },
+];
