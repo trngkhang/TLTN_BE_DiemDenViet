@@ -1,4 +1,4 @@
-import DestinationType from "../models/destinationType.js";
+import DestinationType from "../models/destinationType.models.js";
 import { errorHandler } from "../utils/errorHandler.js";
 
 export const postDestinationType = async (req, res, next) => {
