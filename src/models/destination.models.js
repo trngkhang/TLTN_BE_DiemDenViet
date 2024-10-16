@@ -14,7 +14,7 @@ const DestinationSchema = mongoose.Schema(
       default:
         "https://img.freepik.com/free-vector/vietnam-map-touristic-isometric-poster_1284-17336.jpg",
     },
-    introduce: { type: String, default: "Đang cập nhật" },
+    introduce: { type: String, default: "Đang cập nhật", required: true },
     description: { type: String },
     address: { type: String, default: "Đang cập nhật" },
     openingTime: { type: String, default: "Đang cập nhật" },

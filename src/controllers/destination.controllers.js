@@ -37,3 +37,34 @@ export const postDestination = async (req, res, next) => {
     next(error);
   }
 };
+
+export const getDestination = async (req, res, next) => {
+  try {
+    const { id, searchTerm, destinationTypeId, provinceId } = req.query;
+    const startIndex = parseInt(req.query.startIndex) || 0;
+    const limit = parseInt(req.query.limit) || 12;
+    const destinations = await Destination.find({
+      ...(id && { _id: id }),
+      ...(destinationTypeId && { destinationTypeId: destinationTypeId }),
+      ...(provinceId && { provinceId: provinceId }),
+      ...(searchTerm && {
+        $or: [
+          { name: { $regex: searchTerm, $options: "i" } },
+          { introduce: { $regex: introduce, $options: "i" } },
+          { description: { $regex: description, $options: "i" } },
+        ],
+      }),
+    })
+      .skip(startIndex)
+      .limit(limit);
+
+    const totalDestinations = destinations.length;
+
+    res.status(200).json({
+      totalDestinations,
+      destinations,
+    });
+  } catch (error) {
+    next(error);
+  }
+};

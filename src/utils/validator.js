@@ -220,7 +220,7 @@ export const validatePostDestination = [
     .withMessage("Name must contain only letters and spaces")
     .bail(),
 
-  body("image").isString().withMessage("Image be a string").bail(),
+  body("image").optional().isString().withMessage("Image be a string").bail(),
 
   body("introduce")
     .not()
@@ -235,14 +235,11 @@ export const validatePostDestination = [
     .withMessage("Descriptionmust be a string")
     .bail(),
 
-  body("address").bail().isString().withMessage("Address be a string").bail(),
+  body("address").optional().bail().isString().withMessage("Address be a string").bail(),
 
-  body("openingTime").isString().withMessage("Opening Time be a string").bail(),
+  body("openingTime").optional().isString().withMessage("Opening Time be a string").bail(),
 
-  body("ticketPrice")
-    .isString()
-    .withMessage("Ticket price Time be a string")
-    .bail(),
+  body("ticketPrice").optional().isString().withMessage("Ticket price be a string").bail(),
 
   body("provinceId")
     .not()
