@@ -22,3 +22,20 @@ export const verifyAdmin = (req, res, next) => {
     next(error);
   }
 };
+
+export const verifyUser = (req, res, next) => {
+  try {
+    const token = req.cookies.access_token;
+    if (!token) {
+      return next(errorHandler(401, "Unauthorized"));
+    }
+    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+      if (err) {
+        return next(errorHandler(401, "Unauthorized"));
+      }
+      next();
+    });
+  } catch (error) {
+    next(error);
+  }
+};

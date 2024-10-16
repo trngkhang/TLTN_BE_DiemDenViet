@@ -138,6 +138,7 @@ export const validateId = [
     .bail()
     .isString()
     .withMessage("Id must be a string")
+    .bail()
     .isLength({ min: 24, max: 24 })
     .withMessage("Id must be 24 characters long")
     .bail()
@@ -235,11 +236,24 @@ export const validatePostDestination = [
     .withMessage("Descriptionmust be a string")
     .bail(),
 
-  body("address").optional().bail().isString().withMessage("Address be a string").bail(),
+  body("address")
+    .optional()
+    .bail()
+    .isString()
+    .withMessage("Address be a string")
+    .bail(),
 
-  body("openingTime").optional().isString().withMessage("Opening Time be a string").bail(),
+  body("openingTime")
+    .optional()
+    .isString()
+    .withMessage("Opening Time be a string")
+    .bail(),
 
-  body("ticketPrice").optional().isString().withMessage("Ticket price be a string").bail(),
+  body("ticketPrice")
+    .optional()
+    .isString()
+    .withMessage("Ticket price be a string")
+    .bail(),
 
   body("provinceId")
     .not()
@@ -248,9 +262,9 @@ export const validatePostDestination = [
     .bail()
     .isString()
     .withMessage("Province id must be a string")
+    .bail()
     .isLength({ min: 24, max: 24 })
     .withMessage("Province id must be 24 characters long")
-    .bail()
     .bail()
     .matches(/^[a-f0-9]+$/)
     .withMessage("Invalid province id")
@@ -263,12 +277,58 @@ export const validatePostDestination = [
     .bail()
     .isString()
     .withMessage("Destination type id must be a string")
+    .bail()
     .isLength({ min: 24, max: 24 })
     .withMessage("Destination type id must be 24 characters long")
     .bail()
-    .bail()
     .matches(/^[a-f0-9]+$/)
     .withMessage("Invalid destination type id")
+    .bail(),
+
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return next(errorHandler(400, errors.array()[0].msg));
+    }
+    next();
+  },
+];
+
+export const validateReview = [
+  body("rating")
+    .not()
+    .isEmpty()
+    .withMessage("Rating must not be empty")
+    .bail()
+    .isNumeric()
+    .withMessage("Rating must be number")
+    .bail(),
+
+  body("comment")
+    .optional()
+    .isString()
+    .withMessage("Destination type id must be a string")
+    .bail()
+    .isLength({ max: 500 })
+    .withMessage("Comment must be less than 500 characters long")
+    .bail(),
+
+  body("userId")
+    .not()
+    .isEmpty()
+    .withMessage("User id must not be empty")
+    .bail()
+    .isMongoId()
+    .withMessage("Invalid user id")
+    .bail(),
+
+  body("destinationId")
+    .not()
+    .isEmpty()
+    .withMessage("Destination id must not be empty")
+    .bail()
+    .isMongoId()
+    .withMessage("Invalid destination id")
     .bail(),
 
   (req, res, next) => {
