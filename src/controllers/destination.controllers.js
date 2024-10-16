@@ -40,11 +40,10 @@ export const postDestination = async (req, res, next) => {
 
 export const getDestination = async (req, res, next) => {
   try {
-    const { id, searchTerm, destinationTypeId, provinceId } = req.query;
+    const { searchTerm, destinationTypeId, provinceId } = req.query;
     const startIndex = parseInt(req.query.startIndex) || 0;
     const limit = parseInt(req.query.limit) || 12;
     const destinations = await Destination.find({
-      ...(id && { _id: id }),
       ...(destinationTypeId && { destinationTypeId: destinationTypeId }),
       ...(provinceId && { provinceId: provinceId }),
       ...(searchTerm && {
@@ -106,6 +105,22 @@ export const putDestination = async (req, res, next) => {
       message: "Destination has been updated",
       newDestination,
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getDestinationById = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const destination = await Destination.findById(id);
+    if (!destination) {
+      return next(errorHandler(404, "Destination not found"));
+    }
+    destination.views += 1;
+    await destination.save();
+
+    return res.status(200).json(destination);
   } catch (error) {
     next(error);
   }
