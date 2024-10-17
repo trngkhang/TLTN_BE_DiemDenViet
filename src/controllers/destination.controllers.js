@@ -59,7 +59,7 @@ export const getDestination = async (req, res, next) => {
 
     const totalDestinations = destinations.length;
 
-    res.status(200).json({
+    return res.status(200).json({
       totalDestinations,
       destinations,
     });
