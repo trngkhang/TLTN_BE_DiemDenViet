@@ -1,4 +1,4 @@
-import { body, param, validationResult } from "express-validator";
+import { body, param, query, validationResult } from "express-validator";
 import { errorHandler } from "./errorHandler.js";
 
 export const validateSignup = [
@@ -329,6 +329,25 @@ export const validateReview = [
     .bail()
     .isMongoId()
     .withMessage("Invalid destination id")
+    .bail(),
+
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return next(errorHandler(400, errors.array()[0].msg));
+    }
+    next();
+  },
+];
+
+export const validateDeleteReview = [
+  body("userId")
+    .not()
+    .isEmpty()
+    .withMessage("User id must not be empty")
+    .bail()
+    .isMongoId()
+    .withMessage("Invalid user id")
     .bail(),
 
   (req, res, next) => {

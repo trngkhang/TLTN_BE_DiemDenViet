@@ -42,7 +42,7 @@ ReviewSchema.pre("save", function (next) {
       }
       if (!destination) {
         // Nếu Destination không tồn tại, ngăn lưu review
-        return next(new Error("Destination type id not found"));
+        return next(new Error("Destination id not found"));
       }
       // Nếu cả user và destinationw đều tồn tại, tiếp tục lưu
       next();
