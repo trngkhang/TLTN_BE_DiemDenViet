@@ -5,6 +5,7 @@ import provinceRoutes from "./province.routes.js";
 import destinationTypeRoutes from "./destinationType.routes.js";
 import destinationRoutes from "./destination.routes.js";
 import reviewRoutes from "./review.routes.js";
+import userRoutes from "./user.routes.js";
 
 const router = express.Router();
 
@@ -14,5 +15,6 @@ router.use("/provinces", provinceRoutes);
 router.use("/destination-type", destinationTypeRoutes);
 router.use("/destination", destinationRoutes);
 router.use("/review", reviewRoutes);
+router.use("/user", userRoutes);
 
 export default router;
