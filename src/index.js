@@ -3,10 +3,12 @@ import cookieParser from "cookie-parser";
 import envVar from "./utils/envVariable.js";
 import connectToDatabase from "./utils/connectToDB.js";
 import indexRoutes from "./routes/index.routes.js";
+import cors from "cors";
 
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
+app.use(cors({ origin: envVar.feUrl, credentials: true }));
 
 app.get("/", (req, res) => {
   res.send("Server is OK");
