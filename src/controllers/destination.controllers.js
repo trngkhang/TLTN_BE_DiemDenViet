@@ -43,21 +43,22 @@ export const getDestination = async (req, res, next) => {
     const { searchTerm, destinationTypeId, provinceId } = req.query;
     const startIndex = parseInt(req.query.startIndex) || 0;
     const limit = parseInt(req.query.limit) || 12;
-    const destinations = await Destination.find({
+
+    const query = {
       ...(destinationTypeId && { destinationTypeId: destinationTypeId }),
       ...(provinceId && { provinceId: provinceId }),
       ...(searchTerm && {
         $or: [
           { name: { $regex: searchTerm, $options: "i" } },
-          { introduce: { $regex: introduce, $options: "i" } },
-          { description: { $regex: description, $options: "i" } },
+          { introduce: { $regex: searchTerm, $options: "i" } },
         ],
       }),
-    })
+    };
+
+    const totalDestinations = await Destination.countDocuments(query);
+    const destinations = await Destination.find(query)
       .skip(startIndex)
       .limit(limit);
-
-    const totalDestinations = destinations.length;
 
     return res.status(200).json({
       totalDestinations,
