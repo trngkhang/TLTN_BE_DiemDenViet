@@ -17,15 +17,25 @@ export const getReview = async (req, res, next) => {
     const { id, destinationId, userId } = req.query;
     const startIndex = parseInt(req.query.startIndex) || 0;
     const limit = parseInt(req.query.limit) || 12;
-    const reviews = await Review.find({
+
+    const filter = {
       ...(id && { _id: id }),
       ...(destinationId && { destinationId: destinationId }),
       ...(userId && { userId: userId }),
-    })
-      .skip(startIndex)
-      .limit(limit);
+    };
 
-    return res.status(200).json(reviews);
+    const totalReviews = await Review.countDocuments(filter);
+
+    const reviews = await Review.find(filter)
+      .sort({ createdAt: -1 })
+      .skip(startIndex)
+      .limit(limit)
+      .populate("userId", "name avatar");
+
+    return res.status(200).json({
+      totalReviews,
+      reviews,
+    });
   } catch (error) {
     next(error);
   }
