@@ -358,3 +358,51 @@ export const validateDeleteReview = [
     next();
   },
 ];
+
+export const validatePutUser = [
+  body("avatarr").optional().isURL().withMessage("Avatar must be url").bail(),
+
+  body("name")
+    .optional()
+    .isString()
+    .withMessage("Name must be a string")
+    .bail()
+    .isLength({ min: 3, max: 30 })
+    .withMessage("Name must be between 3 and 30 characters long")
+    .bail()
+    .matches(/^[\p{L}0-9 ]+$/u)
+    .withMessage("Name must contain only letters and spaces")
+    .bail(),
+
+  body("username")
+    .optional()
+    .isString()
+    .withMessage("Username must be a string")
+    .bail()
+    .isLength({ min: 6, max: 30 })
+    .withMessage("Username must be between 6 and 30 characters long")
+    .bail()
+    .matches(/^[a-zA-Z0-9]+$/)
+    .withMessage("Username must not contain spaces or special characters")
+    .bail(),
+
+  body("password")
+    .optional()
+    .isString()
+    .withMessage("Password must be a string")
+    .bail()
+    .isLength({ min: 6, max: 30 })
+    .withMessage("Password must be at least 6 characters long")
+    .bail()
+    .matches(/^\S*$/)
+    .withMessage("Password must not contain spaces")
+    .bail(),
+
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return next(errorHandler(400, errors.array()[0].msg));
+    }
+    next();
+  },
+];
