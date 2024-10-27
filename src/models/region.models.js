@@ -7,6 +7,7 @@ const RegionSchema = mongoose.Schema(
       type: String,
       default: "Đang cập nhật",
     },
+    isDeleted: { type: Boolean, default: false },
   },
   { timestamps: true, minimize: false, strict: true }
 );

@@ -21,12 +21,15 @@ export const postRegion = async (req, res, next) => {
 
 export const getAllRegion = async (req, res, next) => {
   try {
-    const regions = await Region.find({});
-    if (!regions) {
+    const isDeleted = req.query.isDeleted;
+    const filter =
+      isDeleted !== undefined ? { isDeleted: isDeleted === "true" } : {};
+    const regions = await Region.find(filter);
+
+    if (!regions.length) {
       return next(errorHandler(404, "No regions found"));
     }
-    const totalRegions = await Region.countDocuments();
-
+    const totalRegions = await Region.countDocuments(filter);
     return res.status(200).json({ totalRegions, regions });
   } catch (error) {
     next(error);
@@ -67,6 +70,19 @@ export const putRegion = async (req, res, next) => {
     return res
       .status(200)
       .json({ message: "Region has been update", updateRegion });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteRegion = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const deletedRegion = await Region.findByIdAndUpdate(id, {
+      isDeleted: true,
+    });
+    if (!deletedRegion) return next(errorHandler(404, "Region not found."));
+    return res.status(200).json({ message: "Region has been deleted." });
   } catch (error) {
     next(error);
   }
