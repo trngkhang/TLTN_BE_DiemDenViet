@@ -6,7 +6,11 @@ import {
   postRegion,
   putRegion,
 } from "../controllers/region.controllers.js";
-import { validateId, validatePostRegion } from "../utils/validator.js";
+import {
+  validateId,
+  validatePostRegion,
+  validatePutRegion,
+} from "../utils/validator.js";
 import { verifyAdmin } from "../utils/verifyToken.js";
 
 const router = express.Router();
@@ -14,6 +18,7 @@ const router = express.Router();
 router.post("/", verifyAdmin, validatePostRegion, postRegion);
 router.get("/", getAllRegion);
 router.get("/:id", validateId, getRegion);
-router.put("/:id", verifyAdmin, validateId, validatePostRegion, putRegion);
+router.put("/:id", verifyAdmin, validateId, validatePutRegion, putRegion);
 router.delete("/:id", verifyAdmin, validateId, deleteRegion);
+
 export default router;

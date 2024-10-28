@@ -130,6 +130,49 @@ export const validatePostRegion = [
   },
 ];
 
+export const validatePutRegion = [
+  body("name")
+    .not()
+    .isEmpty()
+    .withMessage("Name must not be empty")
+    .bail()
+    .isString()
+    .withMessage("Name must be a string")
+    .bail()
+    .isLength({ min: 6, max: 50 })
+    .withMessage("Name must be between 6 and 50 characters long")
+    .bail()
+    .matches(/^[\p{L}0-9 ]+$/u)
+    .withMessage("Name must contain only letters and spaces")
+    .bail(),
+
+  body("description")
+    .not()
+    .isEmpty()
+    .withMessage("Descriptionmust not be empty")
+    .bail()
+    .isString()
+    .withMessage("Descriptionmust be a string")
+    .bail(),
+
+  body("isDeleted")
+    .not()
+    .isEmpty()
+    .withMessage("isDeleted not be empty")
+    .bail()
+    .isBoolean()
+    .withMessage("Descriptionmust be boolean")
+    .bail(),
+
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return next(errorHandler(400, errors.array()[0].msg));
+    }
+    next();
+  },
+];
+
 export const validateId = [
   param("id")
     .not()

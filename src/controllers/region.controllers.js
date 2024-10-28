@@ -56,13 +56,14 @@ export const putRegion = async (req, res, next) => {
     if (!region) {
       return next(errorHandler(404, "Region not found"));
     }
-    const { name, description } = req.body;
+    const { name, description, isDeleted } = req.body;
 
     const updateRegion = await Region.findByIdAndUpdate(
       id,
       {
         name: name,
         description: description,
+        isDeleted: isDeleted,
       },
       { new: true }
     );
