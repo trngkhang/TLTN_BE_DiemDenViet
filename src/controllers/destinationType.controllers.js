@@ -51,13 +51,14 @@ export const getDestinationType = async (req, res, next) => {
 export const putDestinationType = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { name, description } = req.body;
+    const { name, description, isDeleted } = req.body;
 
     const updatedDestinationType = await DestinationType.findByIdAndUpdate(
       id,
       {
         name: name,
         description: description,
+        isDeleted: isDeleted,
       },
       { new: true }
     );
@@ -66,7 +67,7 @@ export const putDestinationType = async (req, res, next) => {
     }
     return res
       .status(200)
-      .json({ message: "Region has been update", updatedDestinationType });
+      .json({ message: "Destination Type has been update", updatedDestinationType });
   } catch (error) {
     next(error);
   }

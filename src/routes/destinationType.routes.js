@@ -5,7 +5,11 @@ import {
   postDestinationType,
   putDestinationType,
 } from "../controllers/destinationType.controllers.js";
-import { validateId, validatePostRegion } from "../utils/validator.js";
+import {
+  validateId,
+  validatePostRegion,
+  validatePutRegion,
+} from "../utils/validator.js";
 import { verifyAdmin } from "../utils/verifyToken.js";
 
 const router = express.Router();
@@ -17,7 +21,7 @@ router.put(
   "/:id",
   verifyAdmin,
   validateId,
-  validatePostRegion,
+  validatePutRegion,
   putDestinationType
 );
 
