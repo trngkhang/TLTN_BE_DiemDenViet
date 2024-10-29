@@ -72,3 +72,16 @@ export const putDestinationType = async (req, res, next) => {
     next(error);
   }
 };
+
+export const deleteDestinationType = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const deletedDestinationType = await DestinationType.findByIdAndUpdate(id, {
+      isDeleted: true,
+    });
+    if (!deletedDestinationType) return next(errorHandler(404, "Destination type not found."));
+    return res.status(200).json({ message: "Destination type has been deleted." });
+  } catch (error) {
+    next(error);
+  }
+};

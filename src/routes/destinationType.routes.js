@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  deleteDestinationType,
   getAllDestinationType,
   getDestinationType,
   postDestinationType,
@@ -24,5 +25,6 @@ router.put(
   validatePutRegion,
   putDestinationType
 );
+router.delete("/:id", verifyAdmin, validateId, deleteDestinationType);
 
 export default router;
