@@ -21,7 +21,11 @@ export const postProvince = async (req, res, next) => {
 
 export const getAllProvince = async (req, res, next) => {
   try {
-    const provinces = await Province.find({});
+    const isDeleted = req.query.isDeleted;
+    const filter =
+      isDeleted !== undefined ? { isDeleted: isDeleted === "true" } : {};
+
+    const provinces = await Province.find(filter).populate("regionId", "name");
 
     if (!provinces) {
       return next(errorHandler(404, "Provinces not found"));

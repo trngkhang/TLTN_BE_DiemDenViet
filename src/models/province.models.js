@@ -12,6 +12,7 @@ const ProvinceSchema = mongoose.Schema(
       ref: "Region",
       required: true,
     },
+    isDeleted: { type: Boolean, default: false },
   },
   { timestamps: true, minimize: false, strict: true }
 );
