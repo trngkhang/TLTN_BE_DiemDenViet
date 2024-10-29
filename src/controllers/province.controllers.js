@@ -72,3 +72,16 @@ export const putProvince = async (req, res, next) => {
     next(error);
   }
 };
+
+export const deleteProvince = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const deletedProvince = await Province.findByIdAndUpdate(id, {
+      isDeleted: true,
+    });
+    if (!deletedProvince) return next(errorHandler(404, "Province not found."));
+    return res.status(200).json({ message: "Province has been deleted." });
+  } catch (error) {
+    next(error);
+  }
+};

@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  deleteProvince,
   getAllProvince,
   getProvince,
   postProvince,
@@ -14,5 +15,6 @@ router.post("/", verifyAdmin, validatePostProvince, postProvince);
 router.get("/", getAllProvince);
 router.get("/:id", validateId, getProvince);
 router.put("/:id", verifyAdmin, validateId, validatePostProvince, putProvince);
+router.delete("/:id", verifyAdmin, validateId, deleteProvince);
 
 export default router;
