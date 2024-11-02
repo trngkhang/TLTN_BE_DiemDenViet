@@ -8,6 +8,7 @@ const WardSchema = mongoose.Schema(
       ref: "District",
       required: true,
     },
+    isDeleted: { type: Boolean, default: false },
   },
   { timestamps: true, minimize: false, strict: true }
 );

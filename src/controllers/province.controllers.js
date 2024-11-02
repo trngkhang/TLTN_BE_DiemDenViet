@@ -3,14 +3,14 @@ import { errorHandler } from "../utils/errorHandler.js";
 
 export const postProvince = async (req, res, next) => {
   try {
-    const { name, description, regionId } = req.body;
+    const { name, regionId } = req.body;
 
     const province = await Province.findOne({ name: name });
     if (province) {
       return next(errorHandler(400, "Province already exists"));
     }
 
-    const newProvince = new Province({ name, description, regionId });
+    const newProvince = new Province({ name,  regionId });
     const savedProvince = await newProvince.save();
 
     return res.status(200).json(savedProvince);
@@ -54,12 +54,11 @@ export const getProvince = async (req, res, next) => {
 export const putProvince = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { name, description, regionId } = req.body;
+    const { name,  regionId } = req.body;
     const updatedProvince = await Province.findByIdAndUpdate(
       id,
       {
-        name,
-        description,
+        name, 
         regionId,
       },
       { new: true }

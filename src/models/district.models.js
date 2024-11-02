@@ -8,6 +8,7 @@ const DistrictSchema = mongoose.Schema(
       ref: "Province",
       required: true,
     },
+    isDeleted: { type: Boolean, default: false },
   },
   { timestamps: true, minimize: false, strict: true }
 );
