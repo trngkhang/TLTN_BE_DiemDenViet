@@ -215,15 +215,6 @@ export const validatePostProvince = [
     .withMessage("Name must contain only letters and spaces")
     .bail(),
 
-  body("description")
-    .not()
-    .isEmpty()
-    .withMessage("Descriptionmust not be empty")
-    .bail()
-    .isString()
-    .withMessage("Descriptionmust be a string")
-    .bail(),
-
   body("regionId")
     .not()
     .isEmpty()
@@ -439,6 +430,40 @@ export const validatePutUser = [
     .bail()
     .matches(/^\S*$/)
     .withMessage("Password must not contain spaces")
+    .bail(),
+
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return next(errorHandler(400, errors.array()[0].msg));
+    }
+    next();
+  },
+];
+
+export const validatePostDistrict = [
+  body("name")
+    .not()
+    .isEmpty()
+    .withMessage("Name must not be empty")
+    .bail()
+    .isString()
+    .withMessage("Name must be a string")
+    .bail()
+    .isLength({ min: 6, max: 50 })
+    .withMessage("Name must be between 6 and 50 characters long")
+    .bail()
+    .matches(/^[\p{L}0-9 ]+$/u)
+    .withMessage("Name must contain only letters and spaces")
+    .bail(),
+
+  body("provinceId")
+    .not()
+    .isEmpty()
+    .withMessage("provinceId must not be empty")
+    .bail()
+    .isMongoId()
+    .withMessage("Invalid provinceId")
     .bail(),
 
   (req, res, next) => {

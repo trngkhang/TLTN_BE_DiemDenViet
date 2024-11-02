@@ -10,7 +10,7 @@ export const postProvince = async (req, res, next) => {
       return next(errorHandler(400, "Province already exists"));
     }
 
-    const newProvince = new Province({ name,  regionId });
+    const newProvince = new Province({ name, regionId });
     const savedProvince = await newProvince.save();
 
     return res.status(200).json(savedProvince);
@@ -25,7 +25,7 @@ export const getAllProvince = async (req, res, next) => {
     const filter =
       isDeleted !== undefined ? { isDeleted: isDeleted === "true" } : {};
 
-    const provinces = await Province.find(filter).populate("regionId", "name");
+    const provinces = await Province.find(filter);
 
     if (!provinces) {
       return next(errorHandler(404, "Provinces not found"));
@@ -54,12 +54,13 @@ export const getProvince = async (req, res, next) => {
 export const putProvince = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { name,  regionId } = req.body;
+    const { name, regionId, isDeleted } = req.body;
     const updatedProvince = await Province.findByIdAndUpdate(
       id,
       {
-        name, 
+        name,
         regionId,
+        isDeleted,
       },
       { new: true }
     );
