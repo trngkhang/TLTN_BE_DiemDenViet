@@ -474,3 +474,37 @@ export const validatePostDistrict = [
     next();
   },
 ];
+
+export const validatePostWard = [
+  body("name")
+    .not()
+    .isEmpty()
+    .withMessage("Name must not be empty")
+    .bail()
+    .isString()
+    .withMessage("Name must be a string")
+    .bail()
+    .isLength({ min: 6, max: 50 })
+    .withMessage("Name must be between 6 and 50 characters long")
+    .bail()
+    .matches(/^[\p{L}0-9 ]+$/u)
+    .withMessage("Name must contain only letters and spaces")
+    .bail(),
+
+  body("districtId")
+    .not()
+    .isEmpty()
+    .withMessage("districtId must not be empty")
+    .bail()
+    .isMongoId()
+    .withMessage("Invalid districtId")
+    .bail(),
+
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return next(errorHandler(400, errors.array()[0].msg));
+    }
+    next();
+  },
+];

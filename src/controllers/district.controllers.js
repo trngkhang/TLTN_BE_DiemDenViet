@@ -6,7 +6,10 @@ export const postDistrict = async (req, res, next) => {
     try {
       const { name, provinceId } = req.body;
 
-      const district = await District.findOne({ name: name });
+      const district = await District.findOne({
+        name: name,
+        provinceId: provinceId,
+      });
       if (district) {
         return next(errorHandler(400, "District already exists"));
       }
