@@ -16,7 +16,24 @@ const DestinationSchema = mongoose.Schema(
     },
     introduce: { type: String, default: "Đang cập nhật", required: true },
     description: { type: String },
-    address: { type: String, default: "Đang cập nhật" },
+    address: {
+      streetAddress: { type: String, required: true },
+      wardId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Ward",
+        required: true,
+      },
+      districtId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "District",
+        required: true,
+      },
+      provinceId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Province",
+        required: true,
+      },
+    },
     openingTime: { type: String, default: "Đang cập nhật" },
     ticketPrice: { type: String, default: "Đang cập nhật" },
     views: { type: Number, default: 0, min: 0 },
