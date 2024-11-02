@@ -21,7 +21,10 @@ export const postDestinationType = async (req, res, next) => {
 
 export const getAllDestinationType = async (req, res, next) => {
   try {
-    const destinationTypes = await DestinationType.find({});
+    const isDeleted = req.query.isDeleted;
+    const filter =
+      isDeleted !== undefined ? { isDeleted: isDeleted === "true" } : {};
+    const destinationTypes = await DestinationType.find(filter);
     if (!destinationTypes) {
       return next(errorHandler(404, "No destiantion type found"));
     }
@@ -67,7 +70,10 @@ export const putDestinationType = async (req, res, next) => {
     }
     return res
       .status(200)
-      .json({ message: "Destination Type has been update", updatedDestinationType });
+      .json({
+        message: "Destination Type has been update",
+        updatedDestinationType,
+      });
   } catch (error) {
     next(error);
   }
@@ -79,8 +85,11 @@ export const deleteDestinationType = async (req, res, next) => {
     const deletedDestinationType = await DestinationType.findByIdAndUpdate(id, {
       isDeleted: true,
     });
-    if (!deletedDestinationType) return next(errorHandler(404, "Destination type not found."));
-    return res.status(200).json({ message: "Destination type has been deleted." });
+    if (!deletedDestinationType)
+      return next(errorHandler(404, "Destination type not found."));
+    return res
+      .status(200)
+      .json({ message: "Destination type has been deleted." });
   } catch (error) {
     next(error);
   }
