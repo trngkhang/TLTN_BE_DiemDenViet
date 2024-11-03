@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const WardSchema = mongoose.Schema(
   {
-    name: { type: String, required: true, unique: true },
+    name: { type: String, required: true },
     districtId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "District",

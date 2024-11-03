@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const DistrictSchema = mongoose.Schema(
   {
-    name: { type: String, required: true, unique: true },
+    name: { type: String, required: true },
     provinceId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Province",

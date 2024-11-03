@@ -105,12 +105,9 @@ export const validatePostRegion = [
     .isString()
     .withMessage("Name must be a string")
     .bail()
-    .isLength({ min: 6, max: 50 })
+    .isLength({ min: 3, max: 50 })
     .withMessage("Name must be between 6 and 50 characters long")
-    .bail()
-    .matches(/^[\p{L}0-9 ]+$/u)
-    .withMessage("Name must contain only letters and spaces")
-    .bail(),
+    .bail() ,
 
   body("description")
     .not()
@@ -139,12 +136,9 @@ export const validatePutRegion = [
     .isString()
     .withMessage("Name must be a string")
     .bail()
-    .isLength({ min: 6, max: 50 })
+    .isLength({ min: 3, max: 50 })
     .withMessage("Name must be between 6 and 50 characters long")
-    .bail()
-    .matches(/^[\p{L}0-9 ]+$/u)
-    .withMessage("Name must contain only letters and spaces")
-    .bail(),
+    .bail() ,
 
   body("description")
     .not()
@@ -208,27 +202,9 @@ export const validatePostProvince = [
     .isString()
     .withMessage("Name must be a string")
     .bail()
-    .isLength({ min: 6, max: 50 })
+    .isLength({ min: 3, max: 50 })
     .withMessage("Name must be between 6 and 50 characters long")
-    .bail()
-    .matches(/^[\p{L}0-9 ]+$/u)
-    .withMessage("Name must contain only letters and spaces")
-    .bail(),
-
-  body("regionId")
-    .not()
-    .isEmpty()
-    .withMessage("regionId must not be empty")
-    .bail()
-    .isString()
-    .withMessage("regionId must be a string")
-    .bail()
-    .isLength({ min: 24, max: 24 })
-    .withMessage("regionId must be 24 characters long")
-    .bail()
-    .matches(/^[a-f0-9]+$/)
-    .withMessage("Invalid regionId")
-    .bail(),
+    .bail() ,
 
   (req, res, next) => {
     const errors = validationResult(req);
@@ -250,10 +226,7 @@ export const validatePostDestination = [
     .bail()
     .isLength({ min: 6, max: 100 })
     .withMessage("Name must be between 6 and 100 characters long")
-    .bail()
-    .matches(/^[\p{L}0-9 ]+$/u)
-    .withMessage("Name must contain only letters and spaces")
-    .bail(),
+    .bail() ,
 
   body("image").optional().isString().withMessage("Image be a string").bail(),
 
@@ -403,10 +376,7 @@ export const validatePutUser = [
     .bail()
     .isLength({ min: 3, max: 30 })
     .withMessage("Name must be between 3 and 30 characters long")
-    .bail()
-    .matches(/^[\p{L}0-9 ]+$/u)
-    .withMessage("Name must contain only letters and spaces")
-    .bail(),
+    .bail() ,
 
   body("username")
     .optional()
@@ -450,12 +420,9 @@ export const validatePostDistrict = [
     .isString()
     .withMessage("Name must be a string")
     .bail()
-    .isLength({ min: 6, max: 50 })
+    .isLength({ min: 3, max: 50 })
     .withMessage("Name must be between 6 and 50 characters long")
-    .bail()
-    .matches(/^[\p{L}0-9 ]+$/u)
-    .withMessage("Name must contain only letters and spaces")
-    .bail(),
+    .bail() ,
 
   body("provinceId")
     .not()
@@ -484,12 +451,9 @@ export const validatePostWard = [
     .isString()
     .withMessage("Name must be a string")
     .bail()
-    .isLength({ min: 6, max: 50 })
+    .isLength({ min: 3, max: 50 })
     .withMessage("Name must be between 6 and 50 characters long")
-    .bail()
-    .matches(/^[\p{L}0-9 ]+$/u)
-    .withMessage("Name must contain only letters and spaces")
-    .bail(),
+    .bail() ,
 
   body("districtId")
     .not()
