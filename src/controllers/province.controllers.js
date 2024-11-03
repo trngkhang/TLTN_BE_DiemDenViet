@@ -31,8 +31,11 @@ export const getAllProvince = async (req, res, next) => {
       return next(errorHandler(404, "Provinces not found"));
     }
     const totalProvinces = await Province.countDocuments();
+    const responseProvinces = provinces.length();
 
-    return res.status(200).json({ totalProvinces, provinces });
+    return res
+      .status(200)
+      .json({ totalProvinces, responseProvinces, provinces });
   } catch (error) {
     next(error);
   }
