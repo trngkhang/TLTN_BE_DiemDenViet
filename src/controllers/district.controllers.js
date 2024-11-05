@@ -29,19 +29,17 @@ export const postDistrict = async (req, res, next) => {
 export const getAllDistrict = async (req, res, next) => {
   try {
     const { isDeleted, provinceId } = req.query;
-    const filter =
-      isDeleted !== undefined ? { isDeleted: isDeleted === "true" } : {};
-    if (provinceId) {
-      filter.provinceId = provinceId;
-    }
-    console.log(filter);
-    const districts = await District.find(filter);
+    const query = {
+      ...(isDeleted && { isDeleted: isDeleted }),
+      ...(provinceId && { provinceId: provinceId }),
+    };
+    const districts = await District.find(query);
 
-    if (!districts) {
+    if (districts.length == 0) {
       return next(errorHandler(404, "District not found"));
     }
     const totalDistricts = await District.countDocuments();
-    const responseDistricts = districts.length();
+    const responseDistricts = districts.length;
 
     return res
       .status(200)

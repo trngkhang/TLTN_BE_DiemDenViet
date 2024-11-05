@@ -26,18 +26,17 @@ export const postWard = async (req, res, next) => {
 export const getAllWard = async (req, res, next) => {
   try {
     const { isDeleted, districtId } = req.query;
-    const filter =
-      isDeleted !== undefined ? { isDeleted: isDeleted === "true" } : {};
-    if (districtId) {
-      filter.districtId = districtId;
-    }
-    const wards = await Ward.find(filter);
+    const query = {
+      ...(isDeleted && { isDeleted: isDeleted }),
+      ...(districtId && { districtId: districtId }),
+    };
+    const wards = await Ward.find(query);
 
-    if (!wards) {
+    if (wards.length == 0) {
       return next(errorHandler(404, "Ward not found"));
     }
     const totalWards = await Ward.countDocuments();
-    const responseWards = wards.length();
+    const responseWards = wards.length;
     return res.status(200).json({ totalWards, responseWards, wards });
   } catch (error) {
     next(error);

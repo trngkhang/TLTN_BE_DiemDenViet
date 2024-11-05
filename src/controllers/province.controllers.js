@@ -21,17 +21,18 @@ export const postProvince = async (req, res, next) => {
 
 export const getAllProvince = async (req, res, next) => {
   try {
-    const isDeleted = req.query.isDeleted;
-    const filter =
-      isDeleted !== undefined ? { isDeleted: isDeleted === "true" } : {};
+    const { isDeleted } = req.query;
+    const query = {
+      ...(isDeleted && { isDeleted: isDeleted }),
+    };
 
-    const provinces = await Province.find(filter);
+    const provinces = await Province.find(query);
 
-    if (!provinces) {
+    if (provinces.length==0) {
       return next(errorHandler(404, "Provinces not found"));
     }
     const totalProvinces = await Province.countDocuments();
-    const responseProvinces = provinces.length();
+    const responseProvinces = provinces.length;
 
     return res
       .status(200)
