@@ -107,7 +107,7 @@ export const validatePostRegion = [
     .bail()
     .isLength({ min: 3, max: 50 })
     .withMessage("Name must be between 6 and 50 characters long")
-    .bail() ,
+    .bail(),
 
   body("description")
     .not()
@@ -138,7 +138,7 @@ export const validatePutRegion = [
     .bail()
     .isLength({ min: 3, max: 50 })
     .withMessage("Name must be between 6 and 50 characters long")
-    .bail() ,
+    .bail(),
 
   body("description")
     .not()
@@ -204,7 +204,7 @@ export const validatePostProvince = [
     .bail()
     .isLength({ min: 3, max: 50 })
     .withMessage("Name must be between 6 and 50 characters long")
-    .bail() ,
+    .bail(),
 
   (req, res, next) => {
     const errors = validationResult(req);
@@ -226,7 +226,7 @@ export const validatePostDestination = [
     .bail()
     .isLength({ min: 6, max: 100 })
     .withMessage("Name must be between 6 and 100 characters long")
-    .bail() ,
+    .bail(),
 
   body("image").optional().isString().withMessage("Image be a string").bail(),
 
@@ -376,7 +376,7 @@ export const validatePutUser = [
     .bail()
     .isLength({ min: 3, max: 30 })
     .withMessage("Name must be between 3 and 30 characters long")
-    .bail() ,
+    .bail(),
 
   body("username")
     .optional()
@@ -422,7 +422,7 @@ export const validatePostDistrict = [
     .bail()
     .isLength({ min: 3, max: 50 })
     .withMessage("Name must be between 6 and 50 characters long")
-    .bail() ,
+    .bail(),
 
   body("provinceId")
     .not()
@@ -453,7 +453,7 @@ export const validatePostWard = [
     .bail()
     .isLength({ min: 3, max: 50 })
     .withMessage("Name must be between 6 and 50 characters long")
-    .bail() ,
+    .bail(),
 
   body("districtId")
     .not()
@@ -464,6 +464,55 @@ export const validatePostWard = [
     .withMessage("Invalid districtId")
     .bail(),
 
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return next(errorHandler(400, errors.array()[0].msg));
+    }
+    next();
+  },
+];
+
+export const validateName = [
+  body("name")
+    .not()
+    .isEmpty()
+    .withMessage("Name must not be empty")
+    .bail()
+    .isString()
+    .withMessage("Name must be a string")
+    .bail()
+    .isLength({ min: 3, max: 50 })
+    .withMessage("Name must be between 6 and 50 characters long")
+    .bail(),
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return next(errorHandler(400, errors.array()[0].msg));
+    }
+    next();
+  },
+];
+export const validatePostSubcategory = [
+  body("name")
+    .not()
+    .isEmpty()
+    .withMessage("Name must not be empty")
+    .bail()
+    .isString()
+    .withMessage("Name must be a string")
+    .bail()
+    .isLength({ min: 3, max: 50 })
+    .withMessage("Name must be between 6 and 50 characters long")
+    .bail(),
+  body("categoryId")
+    .not()
+    .isEmpty()
+    .withMessage("categoryId must not be empty")
+    .bail()
+    .isMongoId()
+    .withMessage("Invalid categoryId")
+    .bail(),
   (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
