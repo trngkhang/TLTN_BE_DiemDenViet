@@ -11,26 +11,36 @@ export const postDestination = async (req, res, next) => {
       address,
       openingTime,
       ticketPrice,
-      provinceId,
-      destinationTypeId,
+      category,
     } = req.body;
-    console.log(req.body);
     const existingDestination = await Destination.findOne({ name });
     if (existingDestination) {
       return next(errorHandler(400, "Destionation name already exists"));
     }
-
+    console.log(
+      name,
+      image,
+      introduce,
+      description,
+      address,
+      openingTime,
+      ticketPrice,
+      category
+    );
     const newDestination = new Destination({
       name,
-      ...(image && { image }),
       introduce,
+      ...(image && { image }),
       ...(description && { description }),
       ...(address && { address }),
       ...(openingTime && { openingTime }),
       ...(ticketPrice && { ticketPrice }),
-      provinceId,
-      destinationTypeId,
+      category:  {
+        categoryId: category.categoryId,
+        subcategoryId: category.subcategoryId,
+      },
     });
+
     const savedDestionation = await newDestination.save();
     return res.status(200).json(savedDestionation);
   } catch (error) {
@@ -80,22 +90,34 @@ export const putDestination = async (req, res, next) => {
       address,
       openingTime,
       ticketPrice,
-      provinceId,
-      destinationTypeId,
+      category,
     } = req.body;
-
+    console.log(
+      name,
+      image,
+      introduce,
+      description,
+      address,
+      openingTime,
+      ticketPrice,
+      category
+    );
     const newDestination = await Destination.findByIdAndUpdate(
       id,
       {
-        ...(name && name),
-        ...(image && image),
-        ...(introduce && introduce),
-        ...(description && description),
-        ...(address && address),
-        ...(openingTime && openingTime),
-        ...(ticketPrice && ticketPrice),
-        ...(provinceId && provinceId),
-        ...(destinationTypeId && destinationTypeId),
+        ...(name && { name }),
+        ...(image && { image }),
+        ...(introduce && { introduce }),
+        ...(description && { description }),
+        ...(address && { address }),
+        ...(openingTime && { openingTime }),
+        ...(ticketPrice && { ticketPrice }),
+        ...(category && {
+          category: {
+            categoryId: category.categoryId,
+            subcategoryId: category.subcategoryId,
+          },
+        }),
       },
       { new: true }
     );
@@ -120,6 +142,21 @@ export const getDestinationById = async (req, res, next) => {
     }
     destination.views += 1;
     await destination.save();
+
+    return res.status(200).json(destination);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getDestinationForUpdate = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const destination = await Destination.findById(id);
+
+    if (!destination) {
+      return next(errorHandler(404, "Destination not found"));
+    }
 
     return res.status(200).json(destination);
   } catch (error) {

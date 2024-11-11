@@ -243,55 +243,23 @@ export const validatePostDestination = [
     .withMessage("Descriptionmust be a string")
     .bail(),
 
-  body("address")
-    .optional()
-    .bail()
-    .isString()
-    .withMessage("Address be a string")
-    .bail(),
-
-  body("openingTime")
-    .optional()
-    .isString()
-    .withMessage("Opening Time be a string")
-    .bail(),
-
-  body("ticketPrice")
-    .optional()
-    .isString()
-    .withMessage("Ticket price be a string")
-    .bail(),
-
-  body("provinceId")
+  body("category.categoryId")
     .not()
     .isEmpty()
-    .withMessage("Province id must not be empty")
+    .withMessage("categoryId must not be empty")
     .bail()
-    .isString()
-    .withMessage("Province id must be a string")
-    .bail()
-    .isLength({ min: 24, max: 24 })
-    .withMessage("Province id must be 24 characters long")
-    .bail()
-    .matches(/^[a-f0-9]+$/)
-    .withMessage("Invalid province id")
+    .isMongoId()
+    .withMessage("Invalid categoryId")
     .bail(),
 
-  body("destinationTypeId")
+  body("category.subcategoryId")
     .not()
     .isEmpty()
-    .withMessage("Destination type id must not be empty")
+    .withMessage("subcategoryId must not be empty")
     .bail()
-    .isString()
-    .withMessage("Destination type id must be a string")
-    .bail()
-    .isLength({ min: 24, max: 24 })
-    .withMessage("Destination type id must be 24 characters long")
-    .bail()
-    .matches(/^[a-f0-9]+$/)
-    .withMessage("Invalid destination type id")
+    .isMongoId()
+    .withMessage("Invalid subcategoryId")
     .bail(),
-
   (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
