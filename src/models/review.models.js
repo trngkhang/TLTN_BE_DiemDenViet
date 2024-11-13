@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import Destination from "./destination.models.js";
 
 const ReviewSchema = mongoose.Schema(
   {
@@ -49,6 +50,28 @@ ReviewSchema.pre("save", function (next) {
     })
     .catch((err) => next(err));
 });
+
+ReviewSchema.post("save", async function () {
+  await updateAverageRating(this.destinationId);
+});
+
+ReviewSchema.post("findOneAndUpdate", async function (doc) {
+  if (doc) await updateAverageRating(doc.destinationId);
+});
+
+ReviewSchema.post("findOneAndDelete", async function (doc) {
+  if (doc) await updateAverageRating(doc.destinationId);
+});
+
+async function updateAverageRating(destinationId) {
+  const result = await Review.aggregate([
+    { $match: { destinationId: destinationId } },
+    { $group: { _id: "$destinationId", averageRating: { $avg: "$rating" } } },
+  ]);
+
+  const averageRating = result[0] ? result[0].averageRating : 0;
+  await Destination.findByIdAndUpdate(destinationId, { averageRating });
+}
 
 const Review = mongoose.model("Review", ReviewSchema);
 export default Review;
