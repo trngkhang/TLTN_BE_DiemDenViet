@@ -10,6 +10,7 @@ import districtRoutes from "./district.routes.js";
 import wardRoutes from "./ward.routes.js";
 import categoryRoutes from "./category.routes.js";
 import subcategoryRoutes from "./subcategory.routes.js";
+import tripRoutes from "./trip.routes.js";
 
 const router = express.Router();
 
@@ -24,5 +25,6 @@ router.use("/review", reviewRoutes);
 router.use("/user", userRoutes);
 router.use("/category", categoryRoutes);
 router.use("/subcategory", subcategoryRoutes);
+router.use("/trip", tripRoutes);
 
 export default router;

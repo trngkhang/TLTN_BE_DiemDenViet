@@ -489,3 +489,45 @@ export const validatePostSubcategory = [
     next();
   },
 ];
+
+export const validateGenerateTrip = [
+  body("userId")
+    .not()
+    .isEmpty()
+    .withMessage("User id must not be empty")
+    .bail()
+    .isMongoId()
+    .withMessage("Invalid user id")
+    .bail(),
+
+  body("location")
+    .not()
+    .isEmpty()
+    .withMessage("location must not be empty")
+    .bail(),
+
+  body("noOfDay")
+    .not()
+    .isEmpty()
+    .withMessage("noOfDay must not be empty")
+    .bail()
+    .isInt({ min: 1, max: 5 })
+    .withMessage("noOfDay must be a natural number between 1 and 5")
+    .bail(),
+
+  body("traveler")
+    .not()
+    .isEmpty()
+    .withMessage("traveler must not be empty")
+    .bail(),
+
+  body("budget").not().isEmpty().withMessage("budget must not be empty").bail(),
+
+  (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return next(errorHandler(400, errors.array()[0].msg));
+    }
+    next();
+  },
+];
