@@ -32,3 +32,16 @@ export const generateTrip = async (req, res, next) => {
     next(error);
   }
 };
+
+export const getTrip = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const trip = await Trip.findById(id);
+    if (!trip) {
+      return next(errorHandler(404, "Trip not found"));
+    }
+    return res.status(200).json(trip);
+  } catch (error) {
+    next(error);
+  }
+};

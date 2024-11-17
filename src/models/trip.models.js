@@ -13,7 +13,7 @@ const TripSchema = new mongoose.Schema(
       traveler: { type: String, required: true },
       budget: { type: String, required: true },
     },
-    data: { type: Array },
+    data: { type: Object },
   },
   { timestamps: true, minimize: false, strict: true }
 );
