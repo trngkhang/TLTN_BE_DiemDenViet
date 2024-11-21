@@ -14,6 +14,7 @@ const TripSchema = new mongoose.Schema(
       budget: { type: String, required: true },
     },
     data: { type: Object },
+    isDeleted: { type: Boolean, default: false },
   },
   { timestamps: true, minimize: false, strict: true }
 );

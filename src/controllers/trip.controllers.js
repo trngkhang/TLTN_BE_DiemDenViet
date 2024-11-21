@@ -1,5 +1,6 @@
 import Trip from "../models/trip.models.js";
 import { chatSession } from "../service/AIModel.js";
+import { errorHandler } from "../utils/errorHandler.js";
 import { AI_PROMPT } from "../utils/trip.js";
 
 export const generateTrip = async (req, res, next) => {
@@ -36,11 +37,17 @@ export const generateTrip = async (req, res, next) => {
 export const getTrip = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const trip = await Trip.findById(id);
-    if (!trip) {
+    const { isDeleted } = req.query;
+    const query = {
+      _id: id,
+      ...(isDeleted && { isDeleted: isDeleted }),
+    };
+    console.log(query);
+    const trip = await Trip.find(query);
+    if (trip.length === 0) {
       return next(errorHandler(404, "Trip not found"));
     }
-    return res.status(200).json(trip);
+    return res.status(200).json(trip[0]);
   } catch (error) {
     next(error);
   }
@@ -48,14 +55,29 @@ export const getTrip = async (req, res, next) => {
 
 export const getTrips = async (req, res, next) => {
   try {
-    const { userId } = req.query;
+    const { userId, isDeleted } = req.query;
     const query = {
       ...(userId && { userId: userId }),
+      ...(isDeleted && { isDeleted: isDeleted == "true" }),
     };
+    console.log(query);
     const trips = await Trip.find(query);
     const responseTrips = trips.length;
 
-    return res.status(200).json({responseTrips,trips});
+    return res.status(200).json({ responseTrips, trips });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteTrip = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const deletedTrip = await Trip.findByIdAndUpdate(id, {
+      isDeleted: true,
+    });
+    if (!deletedTrip) return next(errorHandler(404, "Trip not found."));
+    return res.status(200).json({ message: "Trip has been deleted." });
   } catch (error) {
     next(error);
   }
