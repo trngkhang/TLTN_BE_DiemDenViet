@@ -45,3 +45,18 @@ export const getTrip = async (req, res, next) => {
     next(error);
   }
 };
+
+export const getTrips = async (req, res, next) => {
+  try {
+    const { userId } = req.query;
+    const query = {
+      ...(userId && { userId: userId }),
+    };
+    const trips = await Trip.find(query);
+    const responseTrips = trips.length;
+
+    return res.status(200).json({responseTrips,trips});
+  } catch (error) {
+    next(error);
+  }
+};
