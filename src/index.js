@@ -1,24 +1,24 @@
 import express from "express";
 import cookieParser from "cookie-parser";
 import envVar from "./utils/envVariable.js";
-import connectToDatabase from "./utils/connectToDB.js";
+import connectToDatabase from "./services/connectToDB.js";
 import indexRoutes from "./routes/index.routes.js";
 import cors from "cors";
+import responseHandler from "./middleware/responseHandler.js";
 
 const app = express();
 app.use(express.json());
+app.use(responseHandler);
 app.use(cookieParser());
 app.use(cors({ origin: envVar.feUrl, credentials: true }));
 
 app.get("/", (req, res) => {
-  res.send("Server is OK");
+  res.send("Máy chủ đang hoạt động");
 });
 app.use("/api", indexRoutes);
 
 app.use((err, req, res, next) => {
-  const statusCode = err.statusCode || 500;
-  const message = err.message || "Internal server error";
-  res.status(statusCode).json({ success: false, statusCode, message });
+  res.error(500, err.message || "Lỗi máy chủ");
 });
 
 app.listen(envVar.port, async () => {

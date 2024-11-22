@@ -7,7 +7,10 @@ import {
   getDestinationForUpdate,
 } from "../controllers/destination.controllers.js";
 import { verifyAdmin } from "../utils/verifyToken.js";
-import { validateId, validatePostDestination } from "../utils/validator.js";
+import {
+  validateId,
+  validatePostDestination,
+} from "../middleware/validator.js";
 
 const router = express.Router();
 

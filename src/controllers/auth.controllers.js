@@ -10,7 +10,10 @@ export const signup = async (req, res, next) => {
 
     const user = await User.findOne({ username: username });
     if (user) {
-      return next(errorHandler(400, "Username already exists"));
+      return res.error(404, "Tên đăng nhập đã tồn tại", {
+        field: "username",
+        message: "Tên đăng nhập đã tồn tại",
+      });
     }
     const salt = await bcryptjs.genSalt(10);
     const hashedPassword = await bcryptjs.hash(password, salt);
@@ -25,14 +28,14 @@ export const signup = async (req, res, next) => {
     const token = jwt.sign(
       { id: savedUser._id, isAdmin: savedUser.isAdmin },
       envVar.jwtSecret,
-      { expiresIn: "1h" }
+      { expiresIn: "24h" }
     );
     const { password: pass, ...rest } = savedUser._doc;
     res
       .status(200)
       .cookie("access_token", token, {
         httpOnly: true,
-        expiresIn: "1h",
+        expiresIn: "24h",
       })
       .json(rest);
   } catch (error) {
@@ -46,22 +49,26 @@ export const signin = async (req, res, next) => {
 
     const validUser = await User.findOne({ username: username });
     if (!validUser) {
-      return next(errorHandler(400, "Username not found"));
+      return res.error(404, "Tên đăng nhập không tồn tại", {
+        field: "username",
+        message: "Tên đăng nhập không tồn tại",
+      });
     }
     const isMatch = await bcryptjs.compare(password, validUser.password);
     if (!isMatch) {
-      return next(errorHandler(400, "Invalid password"));
+      return res.error(401, "Mật khẩu không chính xác");
     }
     const token = jwt.sign(
       { id: validUser._id, isAdmin: validUser.isAdmin },
       envVar.jwtSecret,
-      { expiresIn: "1h" }
+      { expiresIn: "24h" }
     );
     const { password: pass, ...rest } = validUser._doc;
-    return res
-      .status(200)
-      .cookie("access_token", token, { httpOnly: true, expiresIn: "1h" })
-      .json(rest);
+    res.cookie("access_token", token, {
+      httpOnly: true,
+      expiresIn: "24h",
+    });
+    res.success("Đăng nhập thành công", rest);
   } catch (error) {
     next(error);
   }
@@ -69,10 +76,8 @@ export const signin = async (req, res, next) => {
 
 export const signout = async (req, res, next) => {
   try {
-    return res
-      .status(200)
-      .clearCookie("access_token")
-      .json("User has been sign out");
+    res.clearCookie("access_token");
+    res.success("Đăng xuất thành công");
   } catch (error) {
     next(error);
   }

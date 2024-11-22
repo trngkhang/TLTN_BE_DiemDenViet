@@ -10,7 +10,7 @@ import {
   validateId,
   validatePostRegion,
   validatePutRegion,
-} from "../utils/validator.js";
+} from "../middleware/validator.js";
 import { verifyAdmin } from "../utils/verifyToken.js";
 
 const router = express.Router();

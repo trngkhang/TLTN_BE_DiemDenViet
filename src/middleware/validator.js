@@ -1,99 +1,97 @@
 import { body, param, query, validationResult } from "express-validator";
-import { errorHandler } from "./errorHandler.js";
+
+export const validateRequest = (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.error(400, "Lỗi xác thực", {
+      field: errors.array()[0].path,
+      message: errors.array()[0].msg,
+    });
+  }
+  next();
+};
 
 export const validateSignup = [
   body("name")
     .not()
     .isEmpty()
-    .withMessage("Name must not be empty")
+    .withMessage("Tên không được để trống")
     .bail()
     .isString()
-    .withMessage("Name must be a string")
+    .withMessage("Tên phải là chuỗi")
     .bail()
     .isLength({ min: 3, max: 30 })
-    .withMessage("Name must be between 3 and 30 characters long")
+    .withMessage("Tên từ 3 đến 30 kí tự")
     .bail()
     .matches(/^[\p{L}0-9 ]+$/u)
-    .withMessage("Name must contain only letters and spaces")
+    .withMessage("Tên là chữ cái và khoảng trắng")
     .bail(),
 
   body("username")
     .not()
     .isEmpty()
-    .withMessage("Username must not be empty")
+    .withMessage("Tên đăng nhập không được để trống")
     .bail()
     .isString()
-    .withMessage("Username must be a string")
+    .withMessage("Tên đăng nhập phải là chuỗi")
     .bail()
     .isLength({ min: 6, max: 30 })
-    .withMessage("Username must be between 6 and 30 characters long")
+    .withMessage("Tên đăng nhập từ 3 đến 30 kí tự")
     .bail()
     .matches(/^[a-zA-Z0-9]+$/)
-    .withMessage("Username must not contain spaces or special characters")
+    .withMessage("Tên đăng nhập không được chứa số và kí tự")
     .bail(),
 
   body("password")
     .not()
     .isEmpty()
-    .withMessage("Password must not be empty")
+    .withMessage("Mật khẩu không được để trống")
     .bail()
     .isString()
-    .withMessage("Password must be a string")
+    .withMessage("Mật khẩu phải là chuỗi")
     .bail()
     .isLength({ min: 6, max: 30 })
-    .withMessage("Password must be at least 6 characters long")
+    .withMessage("Mật khẩu từ 3 đến 30 kí tự")
     .bail()
     .matches(/^\S*$/)
-    .withMessage("Password must not contain spaces")
+    .withMessage("Mật khẩu không chứa khoảng trắng")
     .bail(),
 
-  (req, res, next) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return next(errorHandler(400, errors.array()[0].msg));
-    }
-    next();
-  },
+  validateRequest,
 ];
 
 export const validateSignin = [
   body("username")
     .not()
     .isEmpty()
-    .withMessage("Username must not be empty")
+    .withMessage("Tên đăng nhập không được để trống")
     .bail()
     .isString()
-    .withMessage("Username must be a string")
+    .withMessage("Tên đăng nhập phải là chuỗi")
     .bail()
     .isLength({ min: 6, max: 30 })
-    .withMessage("Username must be between 6 and 30 characters long")
+    .withMessage("Tên đăng nhập từ 3 đến 30 kí tự")
     .bail()
     .matches(/^[a-zA-Z0-9]+$/)
-    .withMessage("Username must not contain spaces or special characters")
+    .withMessage("Tên đăng nhập không được chứa số và kí tự")
     .bail(),
 
-  body("password")
+    body("password")
     .not()
     .isEmpty()
-    .withMessage("Password must not be empty")
+    .withMessage("Mật khẩu không được để trống")
     .bail()
     .isString()
-    .withMessage("Password must be a string")
+    .withMessage("Mật khẩu phải là chuỗi")
     .bail()
     .isLength({ min: 6, max: 30 })
-    .withMessage("Password must be at least 6 characters long")
+    .withMessage("Mật khẩu từ 3 đến 30 kí tự")
     .bail()
     .matches(/^\S*$/)
-    .withMessage("Password must not contain spaces")
+    .withMessage("Mật khẩu không chứa khoảng trắng")
     .bail(),
 
-  (req, res, next) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return next(errorHandler(400, errors.array()[0].msg));
-    }
-    next();
-  },
+  validateRequest,
 ];
 
 export const validatePostRegion = [
@@ -118,13 +116,7 @@ export const validatePostRegion = [
     .withMessage("Descriptionmust be a string")
     .bail(),
 
-  (req, res, next) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return next(errorHandler(400, errors.array()[0].msg));
-    }
-    next();
-  },
+  validateRequest,
 ];
 
 export const validatePutRegion = [
@@ -158,13 +150,7 @@ export const validatePutRegion = [
     .withMessage("Descriptionmust be boolean")
     .bail(),
 
-  (req, res, next) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return next(errorHandler(400, errors.array()[0].msg));
-    }
-    next();
-  },
+  validateRequest,
 ];
 
 export const validateId = [
@@ -184,13 +170,7 @@ export const validateId = [
     .withMessage("Invalid Id")
     .bail(),
 
-  (req, res, next) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return next(errorHandler(400, errors.array()[0].msg));
-    }
-    next();
-  },
+  validateRequest,
 ];
 
 export const validatePostProvince = [
@@ -206,13 +186,7 @@ export const validatePostProvince = [
     .withMessage("Name must be between 6 and 50 characters long")
     .bail(),
 
-  (req, res, next) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return next(errorHandler(400, errors.array()[0].msg));
-    }
-    next();
-  },
+  validateRequest,
 ];
 
 export const validatePostDestination = [
@@ -260,13 +234,7 @@ export const validatePostDestination = [
     .isMongoId()
     .withMessage("Invalid subcategoryId")
     .bail(),
-  (req, res, next) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return next(errorHandler(400, errors.array()[0].msg));
-    }
-    next();
-  },
+  validateRequest,
 ];
 
 export const validateReview = [
@@ -306,13 +274,7 @@ export const validateReview = [
     .withMessage("Invalid destination id")
     .bail(),
 
-  (req, res, next) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return next(errorHandler(400, errors.array()[0].msg));
-    }
-    next();
-  },
+  validateRequest,
 ];
 
 export const validateDeleteReview = [
@@ -325,13 +287,7 @@ export const validateDeleteReview = [
     .withMessage("Invalid user id")
     .bail(),
 
-  (req, res, next) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return next(errorHandler(400, errors.array()[0].msg));
-    }
-    next();
-  },
+  validateRequest,
 ];
 
 export const validatePutUser = [
@@ -370,13 +326,7 @@ export const validatePutUser = [
     .withMessage("Password must not contain spaces")
     .bail(),
 
-  (req, res, next) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return next(errorHandler(400, errors.array()[0].msg));
-    }
-    next();
-  },
+  validateRequest,
 ];
 
 export const validatePostDistrict = [
@@ -401,13 +351,7 @@ export const validatePostDistrict = [
     .withMessage("Invalid provinceId")
     .bail(),
 
-  (req, res, next) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return next(errorHandler(400, errors.array()[0].msg));
-    }
-    next();
-  },
+  validateRequest,
 ];
 
 export const validatePostWard = [
@@ -432,13 +376,7 @@ export const validatePostWard = [
     .withMessage("Invalid districtId")
     .bail(),
 
-  (req, res, next) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return next(errorHandler(400, errors.array()[0].msg));
-    }
-    next();
-  },
+  validateRequest,
 ];
 
 export const validateName = [
@@ -453,13 +391,7 @@ export const validateName = [
     .isLength({ min: 3, max: 50 })
     .withMessage("Name must be between 6 and 50 characters long")
     .bail(),
-  (req, res, next) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return next(errorHandler(400, errors.array()[0].msg));
-    }
-    next();
-  },
+  validateRequest,
 ];
 export const validatePostSubcategory = [
   body("name")
@@ -481,13 +413,7 @@ export const validatePostSubcategory = [
     .isMongoId()
     .withMessage("Invalid categoryId")
     .bail(),
-  (req, res, next) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return next(errorHandler(400, errors.array()[0].msg));
-    }
-    next();
-  },
+  validateRequest,
 ];
 
 export const validateGenerateTrip = [
@@ -523,11 +449,5 @@ export const validateGenerateTrip = [
 
   body("budget").not().isEmpty().withMessage("budget must not be empty").bail(),
 
-  (req, res, next) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return next(errorHandler(400, errors.array()[0].msg));
-    }
-    next();
-  },
+  validateRequest,
 ];

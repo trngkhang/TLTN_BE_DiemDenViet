@@ -1,5 +1,8 @@
 import express from "express";
-import { validateId, validatePostSubcategory } from "../utils/validator.js";
+import {
+  validateId,
+  validatePostSubcategory,
+} from "../middleware/validator.js";
 import { verifyAdmin } from "../utils/verifyToken.js";
 import {
   deleteSubcategory,

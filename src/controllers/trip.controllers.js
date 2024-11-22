@@ -1,5 +1,5 @@
 import Trip from "../models/trip.models.js";
-import { chatSession } from "../service/AIModel.js";
+import { chatSession } from "../services/AIModel.js";
 import { errorHandler } from "../utils/errorHandler.js";
 import { AI_PROMPT } from "../utils/trip.js";
 

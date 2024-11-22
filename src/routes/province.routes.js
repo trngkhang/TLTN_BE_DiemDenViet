@@ -6,7 +6,7 @@ import {
   postProvince,
   putProvince,
 } from "../controllers/province.controllers.js";
-import { validateId, validatePostProvince } from "../utils/validator.js";
+import { validateId, validatePostProvince } from "../middleware/validator.js";
 import { verifyAdmin } from "../utils/verifyToken.js";
 
 const router = express.Router();

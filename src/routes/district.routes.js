@@ -1,6 +1,6 @@
 import express from "express";
 import { verifyAdmin } from "../utils/verifyToken.js";
-import { validateId, validatePostDistrict } from "../utils/validator.js";
+import { validateId, validatePostDistrict } from "../middleware/validator.js";
 import {
   deleteDistrict,
   getAllDistrict,

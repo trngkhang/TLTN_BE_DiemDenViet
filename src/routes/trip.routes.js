@@ -5,7 +5,7 @@ import {
   getTrip,
   getTrips,
 } from "../controllers/trip.controllers.js";
-import { validateGenerateTrip, validateId } from "../utils/validator.js";
+import { validateGenerateTrip, validateId } from "../middleware/validator.js";
 import { verifyThisUserOrAdmin } from "../utils/verifyToken.js";
 
 const router = express.Router();

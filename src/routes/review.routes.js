@@ -9,7 +9,7 @@ import {
   validateDeleteReview,
   validateId,
   validateReview,
-} from "../utils/validator.js";
+} from "../middleware/validator.js";
 
 const router = express.Router();
 

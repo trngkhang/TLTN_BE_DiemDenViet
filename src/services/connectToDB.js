@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import envVar from "./envVariable.js";
+import envVar from "../utils/envVariable.js";
 
 let isConnected = false;
 
