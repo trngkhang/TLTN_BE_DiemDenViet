@@ -1,20 +1,30 @@
 import express from "express";
-import { verifyAdmin } from "../utils/verifyToken.js";
-import { validateId, validatePostWard } from "../middleware/validator.js";
-import {
-  deleteWard,
-  getAllWard,
-  getWard,
-  postWard,
-  putWard,
-} from "../controllers/ward.controllers.js";
+import AuthMiddleware from "../middlewares/verifyToken.js";
+import { validateId, validatePostWard } from "../middlewares/validator.js";
+import WardController from "../controllers/ward.controllers.js";
 
 const router = express.Router();
 
-router.post("/", verifyAdmin, validatePostWard, postWard);
-router.get("/", getAllWard);
-router.get("/:id", validateId, getWard);
-router.put("/:id", verifyAdmin, validateId, validatePostWard, putWard);
-router.delete("/:id", verifyAdmin, validateId, deleteWard);
+router.post(
+  "/",
+  AuthMiddleware.verifyAdmin,
+  validatePostWard,
+  WardController.post
+);
+router.get("/:id", validateId, WardController.get);
+router.put(
+  "/:id",
+  AuthMiddleware.verifyAdmin,
+  validateId,
+  validatePostWard,
+  WardController.put
+);
+router.get("/", WardController.getAll);
+router.delete(
+  "/:id",
+  AuthMiddleware.verifyAdmin,
+  validateId,
+  WardController.delete
+);
 
 export default router;

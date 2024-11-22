@@ -1,26 +1,27 @@
 import express from "express";
-import { verifyThisUserOrAdmin, verifyUser } from "../utils/verifyToken.js";
-import {
-  getReview,
-  postReview,
-  deleteReview,
-} from "../controllers/review.controllers.js";
+import AuthMiddleware from "../middlewares/verifyToken.js";
+import ReviewController from "../controllers/review.controllers.js";
 import {
   validateDeleteReview,
   validateId,
   validateReview,
-} from "../middleware/validator.js";
+} from "../middlewares/validator.js";
 
 const router = express.Router();
 
-router.post("/", verifyUser, validateReview, postReview);
-router.get("/", getReview);
+router.post(
+  "/",
+  AuthMiddleware.verifyUser,
+  validateReview,
+  ReviewController.post
+);
+router.get("/", ReviewController.get);
 router.delete(
   "/:id",
-  verifyThisUserOrAdmin,
+  AuthMiddleware.verifyThisUserOrAdmin,
   validateId,
   validateDeleteReview,
-  deleteReview
+  ReviewController.delete
 );
 
 export default router;

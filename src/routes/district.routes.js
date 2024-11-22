@@ -1,20 +1,30 @@
 import express from "express";
-import { verifyAdmin } from "../utils/verifyToken.js";
-import { validateId, validatePostDistrict } from "../middleware/validator.js";
-import {
-  deleteDistrict,
-  getAllDistrict,
-  getDistrict,
-  postDistrict,
-  putDistrict,
-} from "../controllers/district.controllers.js";
+import AuthMiddleware from "../middlewares/verifyToken.js";
+import { validateId, validatePostDistrict } from "../middlewares/validator.js";
+import DistrictController from "../controllers/District.controllers.js";
 
 const router = express.Router();
 
-router.post("/", verifyAdmin, validatePostDistrict, postDistrict);
-router.get("/", getAllDistrict);
-router.get("/:id", validateId, getDistrict);
-router.put("/:id", verifyAdmin, validateId, validatePostDistrict, putDistrict);
-router.delete("/:id", verifyAdmin, validateId, deleteDistrict);
+router.post(
+  "/",
+  AuthMiddleware.verifyAdmin,
+  validatePostDistrict,
+  DistrictController.post
+);
+router.get("/", DistrictController.getAll);
+router.get("/:id", validateId, DistrictController.get);
+router.put(
+  "/:id",
+  AuthMiddleware.verifyAdmin,
+  validateId,
+  validatePostDistrict,
+  DistrictController.put
+);
+router.delete(
+  "/:id",
+  AuthMiddleware.verifyAdmin,
+  validateId,
+  DistrictController.delete
+);
 
 export default router;

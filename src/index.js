@@ -4,7 +4,7 @@ import envVar from "./utils/envVariable.js";
 import connectToDatabase from "./services/connectToDB.js";
 import indexRoutes from "./routes/index.routes.js";
 import cors from "cors";
-import responseHandler from "./middleware/responseHandler.js";
+import responseHandler from "./middlewares/responseHandler.js";
 
 const app = express();
 app.use(express.json());

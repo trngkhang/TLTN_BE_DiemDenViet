@@ -1,10 +1,10 @@
 import express from "express";
-import { getUserByToken, putUser } from "../controllers/user.controllers.js";
-import { validateId, validatePutUser } from "../middleware/validator.js";
+import UserController from "../controllers/user.controllers.js";
+import { validateId, validatePutUser } from "../middlewares/validator.js";
 
 const router = express.Router();
 
-router.get("/user-by-token", getUserByToken);
-router.put("/:id", validateId, validatePutUser, putUser);
+router.get("/user-by-token", UserController.getByToken);
+router.put("/:id", validateId, validatePutUser, UserController.put);
 
 export default router;

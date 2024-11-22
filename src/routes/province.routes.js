@@ -1,20 +1,30 @@
 import express from "express";
-import {
-  deleteProvince,
-  getAllProvince,
-  getProvince,
-  postProvince,
-  putProvince,
-} from "../controllers/province.controllers.js";
-import { validateId, validatePostProvince } from "../middleware/validator.js";
-import { verifyAdmin } from "../utils/verifyToken.js";
+import ProvinceController from "../controllers/province.controllers.js";
+import { validateId, validatePostProvince } from "../middlewares/validator.js";
+import AuthMiddleware from "../middlewares/verifyToken.js";
 
 const router = express.Router();
 
-router.post("/", verifyAdmin, validatePostProvince, postProvince);
-router.get("/", getAllProvince);
-router.get("/:id", validateId, getProvince);
-router.put("/:id", verifyAdmin, validateId, validatePostProvince, putProvince);
-router.delete("/:id", verifyAdmin, validateId, deleteProvince);
+router.post(
+  "/",
+  AuthMiddleware.verifyAdmin,
+  validatePostProvince,
+  ProvinceController.post
+);
+router.get("/", ProvinceController.getAll);
+router.get("/:id", validateId, ProvinceController.get);
+router.put(
+  "/:id",
+  AuthMiddleware.verifyAdmin,
+  validateId,
+  validatePostProvince,
+  ProvinceController.put
+);
+router.delete(
+  "/:id",
+  AuthMiddleware.verifyAdmin,
+  validateId,
+  ProvinceController.delete
+);
 
 export default router;
