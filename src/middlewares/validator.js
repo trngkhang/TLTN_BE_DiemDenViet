@@ -3,10 +3,7 @@ import { body, param, query, validationResult } from "express-validator";
 export const validateRequest = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.error(400, "Lỗi xác thực", {
-      field: errors.array()[0].path,
-      message: errors.array()[0].msg,
-    });
+    return res.error(400, errors.array()[0].msg);
   }
   next();
 };
@@ -76,7 +73,7 @@ export const validateSignin = [
     .withMessage("Tên đăng nhập không được chứa số và kí tự")
     .bail(),
 
-    body("password")
+  body("password")
     .not()
     .isEmpty()
     .withMessage("Mật khẩu không được để trống")

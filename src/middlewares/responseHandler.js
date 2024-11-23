@@ -1,7 +1,7 @@
 function responseHandler(req, res, next) {
   res.success = (message = "thành công", data = null) => {
     res.status(200).json({
-      status: "success",
+      status: true,
       code: 200,
       message: message,
       data: data,
@@ -10,7 +10,7 @@ function responseHandler(req, res, next) {
 
   res.error = (code, message = "Có lỗi", errors = null) => {
     res.status(code).json({
-      status: "error",
+      status: false,
       code: code,
       message: message,
       errors: errors,
