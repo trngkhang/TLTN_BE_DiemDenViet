@@ -5,6 +5,7 @@ import { validateId, validatePutUser } from "../middlewares/validator.js";
 const router = express.Router();
 
 router.get("/user-by-token", UserController.getByToken);
+router.get("/", UserController.getAll);
 router.put("/:id", validateId, validatePutUser, UserController.put);
 
 export default router;

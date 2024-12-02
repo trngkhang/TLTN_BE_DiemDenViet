@@ -50,8 +50,9 @@ class DestinationController {
         subcategoryId,
         sortBy,
       } = req.query;
-      const startIndex = parseInt(req.query.startIndex) || 0;
-      const limit = parseInt(req.query.limit) || 12;
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 20;
+      const skip = (page - 1) * limit;
 
       const query = {
         ...(destinationTypeId && { _id: destinationTypeId }),
@@ -75,17 +76,15 @@ class DestinationController {
       } else if (sortBy === "rating") {
         sortOptions = { averageRating: -1 };
       }
-
-      const totalDestinations = await Destination.countDocuments(query);
-      const destinations = await Destination.find(query)
-        .sort(sortOptions)
-        .skip(startIndex)
-        .limit(limit);
+      const [data, total] = await Promise.all([
+        Destination.find(query).sort(sortOptions).skip(skip).limit(limit),
+        Destination.find(query).countDocuments(),
+      ]);
 
       return res.success("Lấy danh sách địa điểm thành công", {
-        totalDestinations,
-        responseDestinations: destinations.length,
-        destinations,
+        total,
+        countRes:data.length,
+        data,
       });
     } catch (error) {
       next(error);
@@ -103,7 +102,7 @@ class DestinationController {
         address,
         openingTime,
         ticketPrice,
-        category,
+        category,isDeleted
       } = req.body;
       const newDestination = await Destination.findByIdAndUpdate(
         id,
@@ -114,7 +113,7 @@ class DestinationController {
           ...(description && { description }),
           ...(address && { address }),
           ...(openingTime && { openingTime }),
-          ...(ticketPrice && { ticketPrice }),
+          ...(ticketPrice && { ticketPrice }),          ...(isDeleted && { isDeleted }),
           ...(category && {
             category: {
               categoryId: category.categoryId,
@@ -164,6 +163,19 @@ class DestinationController {
       }
 
       return res.success("Lấy địa điểm thành công", destination);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async delete(req, res, next) {
+    try {
+      const { id } = req.params;
+      const deletedDistrict = await Destination.findByIdAndUpdate(id, {
+        isDeleted: true,
+      });
+      if (!deletedDistrict) return res.error(404, "Không tìm thấy quận huyện");
+      return res.success("Quận huyện đã bị xóa",deletedDistrict);
     } catch (error) {
       next(error);
     }

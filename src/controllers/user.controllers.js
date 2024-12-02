@@ -2,6 +2,7 @@ import User from "../models/user.models.js";
 import envVar from "../utils/envVariable.js";
 import jwt from "jsonwebtoken";
 import bcryptjs from "bcryptjs";
+import CommonUtil from "../utils/CommonUtil.js";
 
 class UserController {
   static async getByToken(req, res, next) {
@@ -54,6 +55,38 @@ class UserController {
           expiresIn: "6h",
         })
         .success("Cập nhật người dùng thành công", rest);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async getAll(req, res, next) {
+    try {
+      const sortDirection = req.query.order === "asc" ? 1 : -1;
+      const { isDeleted } = req.query;
+      const startIndex = parseInt(req.query.startIndex) || 0;
+      const limit = parseInt(req.query.limit) || 9;
+
+      const query = {
+        ...(isDeleted && { isDeleted: isDeleted == "true" }),
+      };
+      const users = await User.find(query)
+        .sort({ updateAt: sortDirection })
+        .skip(startIndex)
+        .limit(limit);
+      const totalUsers = await User.countDocuments();
+      const responseUsers = users.length;
+
+      const lastMonthUsers = await User.countDocuments({
+        createdAt: { $gte: CommonUtil.oneMonthAgo() },
+      });
+
+      return res.success("Lấy danh sách chuyến đi thành công", {
+        totalUsers,
+        responseUsers,
+        users,
+        lastMonthUsers,
+      });
     } catch (error) {
       next(error);
     }

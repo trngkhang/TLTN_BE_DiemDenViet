@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import Ward from "../models/ward.models.js";
 
 class WardController {
@@ -21,22 +22,128 @@ class WardController {
 
   static async getAll(req, res, next) {
     try {
-      const { isDeleted, districtId } = req.query;
+      const { isDeleted, districtId, provinceId } = req.query;
+      const sortDirection = req.query.order === "asc" ? 1 : -1;
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 20;
+      const skip = (page - 1) * limit;
+      // Build the query object
       const query = {
-        ...(isDeleted && { isDeleted: isDeleted }),
-        ...(districtId && { districtId: districtId }),
+        ...(isDeleted !== undefined && { isDeleted: isDeleted === "true" }),
+        ...(districtId && {
+          districtId: new mongoose.Types.ObjectId(districtId),
+        }),
       };
-      const wards = await Ward.find(query);
+      const [data, total] = await Promise.all([
+        Ward.aggregate([
+          { $match: query }, // Lọc theo điều kiện isDeleted và districtId
+          {
+            $lookup: {
+              from: "districts", // Collection tên "districts"
+              localField: "districtId",
+              foreignField: "_id",
+              as: "district",
+            },
+          },
+          {
+            $unwind: "$district",
+          },
+          {
+            $lookup: {
+              from: "provinces", // Collection tên "provinces"
+              localField: "district.provinceId",
+              foreignField: "_id",
+              as: "province",
+            },
+          },
+          {
+            $unwind: "$province",
+          },
+          {
+            $match: {
+              ...(provinceId && {
+                "province._id": new mongoose.Types.ObjectId(provinceId),
+              }),
+            },
+          },
+          {
+            $lookup: {
+              from: "destinations", // Collection tên "destinations"
+              localField: "_id",
+              foreignField: "address.wardId",
+              as: "destinations",
+            },
+          },
+          {
+            $project: {
+              _id: 1,
+              name: 1,
+              isDeleted: 1,
+              district: { _id: "$district._id", name: "$district.name" },
+              province: { _id: "$province._id", name: "$province.name" },
+              destinationCount: { $size: "$destinations" },
+            },
+          },
+          { $sort: { name: sortDirection } }, // Sắp xếp theo tên
+          { $skip: skip }, // Phân trang: bỏ qua số lượng bản ghi `startIndex`
+          ...(limit ? [{ $limit: limit }] : []),
+        ]),
+        Ward.aggregate([
+          { $match: query }, // Lọc theo điều kiện isDeleted và districtId
+          {
+            $lookup: {
+              from: "districts", // Collection tên "districts"
+              localField: "districtId",
+              foreignField: "_id",
+              as: "district",
+            },
+          },
+          {
+            $unwind: "$district",
+          },
+          {
+            $lookup: {
+              from: "provinces", // Collection tên "provinces"
+              localField: "district.provinceId",
+              foreignField: "_id",
+              as: "province",
+            },
+          },
+          {
+            $unwind: "$province",
+          },
+          {
+            $match: {
+              ...(provinceId && {
+                "province._id": new mongoose.Types.ObjectId(provinceId),
+              }),
+            },
+          },
+          {
+            $lookup: {
+              from: "destinations", // Collection tên "destinations"
+              localField: "_id",
+              foreignField: "address.wardId",
+              as: "destinations",
+            },
+          },
+          {
+            $project: {
+              _id: 1,
+              name: 1,
+              isDeleted: 1,
+              district: { _id: "$district._id", name: "$district.name" },
+              province: { _id: "$province._id", name: "$province.name" },
+              destinationCount: { $size: "$destinations" },
+            },
+          },
+        ]),
+      ]);
 
-      if (wards.length == 0) {
-        return res.error(404, "Không tìm thấy phường");
-      }
-      const totalWards = await Ward.countDocuments();
-      const responseWards = wards.length;
       return res.success("Lấy danh sách phường thành công", {
-        totalWards,
-        responseWards,
-        wards,
+        total: total.length,
+        countRes: data.length,
+        data,
       });
     } catch (error) {
       next(error);

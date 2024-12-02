@@ -1,7 +1,7 @@
 import express from "express";
 import AuthMiddleware from "../middlewares/verifyToken.js";
 import { validateId, validatePostDistrict } from "../middlewares/validator.js";
-import DistrictController from "../controllers/District.controllers.js";
+import DistrictController from "../controllers/district.controllers.js";
 
 const router = express.Router();
 

@@ -13,5 +13,7 @@ const DistrictSchema = mongoose.Schema(
   { timestamps: true, minimize: false, strict: true }
 );
 
+DistrictSchema.index({ provinceId: 1 });
+
 const District = mongoose.model("District", DistrictSchema);
 export default District;

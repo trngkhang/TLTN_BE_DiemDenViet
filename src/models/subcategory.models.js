@@ -13,5 +13,7 @@ const SubcategorySchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+SubcategorySchema.index({ provinceId: 1 });
+
 const Subcategory = mongoose.model("Subcategory", SubcategorySchema);
 export default Subcategory;

@@ -22,15 +22,47 @@ class ProvinceController {
   static async getAll(req, res, next) {
     try {
       const { isDeleted } = req.query;
+      const sortDirection = req.query.order === "asc" ? 1 : -1;
+      const startIndex = parseInt(req.query.startIndex) || 0;
+      const limit = parseInt(req.query.limit) || null;
+
       const query = {
-        ...(isDeleted && { isDeleted: isDeleted }),
+        ...(isDeleted !== undefined && { isDeleted: isDeleted === "true" }),
       };
 
-      const provinces = await Province.find(query);
+      const provinces = await Province.aggregate([
+        { $match: query }, // Lọc theo điều kiện isDeleted nếu có
+        {
+          $lookup: {
+            from: "districts", // Tên collection District
+            localField: "_id",
+            foreignField: "provinceId",
+            as: "districts",
+          },
+        },
+        {
+          $lookup: {
+            from: "destinations", // Tên collection Destination
+            localField: "_id",
+            foreignField: "address.provinceId",
+            as: "destinations",
+          },
+        },
+        {
+          $project: {
+            _id: 1,
+            name: 1,
+            isDeleted: 1,
+            createdAt: 1,
+            updatedAt: 1,
+            districtCount: { $size: "$districts" }, // Đếm số Districts
+            destinationCount: { $size: "$destinations" }, // Đếm số Destinations
+          },
+        },
+        { $sort: { name: sortDirection } }, // Sắp xếp theo tên
+        ...(limit ? [{ $skip: startIndex }, { $limit: limit }] : []), // Phân trang nếu limit không phải "all"
+      ]);
 
-      if (provinces.length == 0) {
-        return res.error(404, "Không tìm thấy tỉnh");
-      }
       const totalProvinces = await Province.countDocuments();
       const responseProvinces = provinces.length;
 

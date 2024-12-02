@@ -24,5 +24,11 @@ router.put(
   validatePostDestination,
   DestinationController.put
 );
+router.delete(
+  "/:id",
+  AuthMiddleware.verifyAdmin,
+  validateId,
+  DestinationController.delete
+);
 
 export default router;

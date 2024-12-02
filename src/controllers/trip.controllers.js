@@ -1,5 +1,6 @@
 import Trip from "../models/trip.models.js";
 import { chatSession } from "../services/AIModel.js";
+import CommonUtil from "../utils/CommonUtil.js";
 import { AI_PROMPT } from "../utils/trip.js";
 
 class TripController {
@@ -56,18 +57,30 @@ class TripController {
   static async getAll(req, res, next) {
     try {
       const { userId, isDeleted } = req.query;
+      const sortDirection = req.query.order === "asc" ? 1 : -1;
+      const startIndex = parseInt(req.query.startIndex) || 0;
+      const limit = parseInt(req.query.limit) || 9;
       const query = {
         ...(userId && { userId: userId }),
         ...(isDeleted && { isDeleted: isDeleted == "true" }),
       };
-      const trips = await Trip.find(query);
+      const trips = await Trip.find(query)
+        .sort({ updateAt: sortDirection })
+        .skip(startIndex)
+        .limit(limit)
+        .populate("userId", "name");
       const totalTrips = await Trip.countDocuments();
       const responseTrips = trips.length;
+
+      const lastMonthTrips = await Trip.countDocuments({
+        createdAt: { $gte: CommonUtil.oneMonthAgo() },
+      });
 
       return res.success("Lấy danh sách chuyến đi thành công", {
         totalTrips,
         responseTrips,
         trips,
+        lastMonthTrips,
       });
     } catch (error) {
       next(error);

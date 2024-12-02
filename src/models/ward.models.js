@@ -13,5 +13,7 @@ const WardSchema = mongoose.Schema(
   { timestamps: true, minimize: false, strict: true }
 );
 
+WardSchema.index({ districtId: 1 });
+
 const Ward = mongoose.model("Ward", WardSchema);
 export default Ward;

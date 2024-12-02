@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import Category from "../models/category.models.js";
 import Subcategory from "../models/Subcategory.models.js";
 
@@ -29,14 +30,49 @@ class SubcategoryController {
   static async getAll(req, res, next) {
     try {
       const { isDeleted, categoryId } = req.query;
+      const sortDirection = req.query.order === "asc" ? 1 : -1;
+      const startIndex = parseInt(req.query.startIndex) || 0;
+      const limit = parseInt(req.query.limit) || null;
+
       const query = {
-        ...(isDeleted && { isDeleted: isDeleted }),
-        ...(categoryId && { categoryId: categoryId }),
+        ...(isDeleted !== undefined && { isDeleted: isDeleted === "true" }),
+        ...(categoryId && { categoryId: new mongoose.Types.ObjectId(categoryId) }),
       };
-      const subcategories = await Subcategory.find(query);
-      if (!subcategories || subcategories.length === 0) {
-        return res.error(404, "Không tìm thấy danh mục con");
-      }
+
+      const subcategories = await Subcategory.aggregate([
+        { $match: query }, // Lọc theo điều kiện isDeleted và categoryId
+        {
+          $lookup: {
+            from: "categories", // Kết nối với bảng Category
+            localField: "categoryId",
+            foreignField: "_id",
+            as: "category",
+          },
+        },
+        {
+          $lookup: {
+            from: "destinations", // Kết nối với bảng Destination
+            localField: "_id",
+            foreignField: "category.subcategoryId",
+            as: "destinations",
+          },
+        },
+        {
+          $project: {
+            _id: 1,
+            name: 1,
+            isDeleted: 1,
+            category: {
+              $arrayElemAt: ["$category", 0], // Lấy object category đầu tiên
+            },
+            destinationCount: { $size: "$destinations" }, // Đếm số destination
+          },
+        },
+        { $sort: { name: sortDirection } }, // Sắp xếp theo tên
+        { $skip: startIndex }, // Phân trang: bỏ qua số lượng bản ghi `startIndex`
+        ...(limit ? [{ $limit: limit }] : []), // Phân trang: giới hạn số lượng bản ghi
+      ]);
+
       const totalSubcategories = await Subcategory.countDocuments();
       const responseSubcategories = subcategories.length;
       return res.success("Lấy danh sách danh mục con thành công", {
@@ -65,12 +101,13 @@ class SubcategoryController {
   static async put(req, res, next) {
     try {
       const { id } = req.params;
-      const { name, isDeleted } = req.body;
+      const { name, isDeleted, categoryId } = req.body;
       const updatedSubcategory = await Subcategory.findByIdAndUpdate(
         id,
         {
           name: name,
           isDeleted: isDeleted,
+          categoryId: categoryId,
         },
         { new: true }
       );
