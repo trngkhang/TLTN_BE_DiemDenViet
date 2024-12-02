@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import Category from "../models/category.models.js";
-import Subcategory from "../models/Subcategory.models.js";
+import Subcategory from "../models/subcategory.models.js";
 
 class SubcategoryController {
   static async post(req, res, next) {
@@ -36,7 +36,9 @@ class SubcategoryController {
 
       const query = {
         ...(isDeleted !== undefined && { isDeleted: isDeleted === "true" }),
-        ...(categoryId && { categoryId: new mongoose.Types.ObjectId(categoryId) }),
+        ...(categoryId && {
+          categoryId: new mongoose.Types.ObjectId(categoryId),
+        }),
       };
 
       const subcategories = await Subcategory.aggregate([
