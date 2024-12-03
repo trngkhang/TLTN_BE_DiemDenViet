@@ -10,7 +10,7 @@ const app = express();
 app.use(express.json());
 app.use(responseHandler);
 app.use(cookieParser());
-app.use(cors({ origin: envVar.feUrl, credentials: true }));
+app.use(cors());
 
 app.get("/", (req, res) => {
   res.send("Máy chủ đang hoạt động");
