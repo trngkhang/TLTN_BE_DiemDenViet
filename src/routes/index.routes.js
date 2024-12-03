@@ -22,5 +22,7 @@ router.use("/user", userRoutes);
 router.use("/category", categoryRoutes);
 router.use("/subcategory", subcategoryRoutes);
 router.use("/trip", tripRoutes);
-
+router.use("/ok", (req, res) => {
+  res.send({ server: "ok" });
+});
 export default router;

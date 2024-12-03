@@ -21,7 +21,10 @@ app.use((err, req, res, next) => {
   res.error(500, err.message || "Lỗi máy chủ");
 });
 
-app.listen(envVar.port, async () => {
+const start = async () => {
   await connectToDatabase();
-  console.log(`Server running on port ${envVar.port}`);
-});
+  app.listen(envVar.port, async () => {
+    console.log(`Server running on port ${envVar.port}`);
+  });
+};
+start();
