@@ -10,26 +10,13 @@ const app = express();
 app.use(express.json());
 app.use(responseHandler);
 app.use(cookieParser());
-app.use(cors());
-app.use((req, res, next) => {
-  res.setHeader(
-    "Access-Control-Allow-Origin",
-    "https://tltn-fe-diem-den-viet.vercel.app"
-  );
-  res.setHeader("Access-Control-Allow-Credentials", "true");
-  res.setHeader(
-    "Access-Control-Allow-Headers",
-    "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version"
-  );
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET, POST, PUT, DELETE, PATCH, OPTIONS"
-  );
-  if (req.method === "OPTIONS") {
-    return res.status(204).end(); // Không gửi thêm body
-  }
-  next();
-});
+app.use(
+  cors({
+    origin: envVar.feUrl,
+    methods: "GET,POST,PUT,DELETE,OPTION",
+    credentials: true,
+  })
+);
 
 app.get("/", (req, res) => {
   res.send("Máy chủ đang hoạt động");
