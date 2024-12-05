@@ -33,8 +33,10 @@ class AuthController {
       const { password: pass, ...rest } = savedUser._doc;
       return res
         .cookie("access_token", token, {
-          httpOnly: true,
           expiresIn: "6h",
+          httpOnly: true, // Bảo mật cookie, không truy cập được từ JS
+          secure: true, // Cookie chỉ được gửi qua HTTPS
+          sameSite: "none", // Đảm bảo cookie hoạt động trên các domain khác nhau
         })
         .success("Đăng ký thành công", rest);
     } catch (error) {
@@ -65,8 +67,10 @@ class AuthController {
       const { password: pass, ...rest } = validUser._doc;
       return res
         .cookie("access_token", token, {
-          httpOnly: true,
           expiresIn: "6h",
+          httpOnly: true, // Bảo mật cookie, không truy cập được từ JS
+          secure: true, // Cookie chỉ được gửi qua HTTPS
+          sameSite: "none", // Đảm bảo cookie hoạt động trên các domain khác nhau
         })
         .success("Đăng nhập thành công", rest);
     } catch (error) {
