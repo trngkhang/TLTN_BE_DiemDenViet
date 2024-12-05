@@ -201,14 +201,6 @@ export const validatePostDestination = [
 
   body("image").optional().isString().withMessage("Image be a string").bail(),
 
-  body("introduce")
-    .not()
-    .isEmpty()
-    .withMessage("Introduce must not be empty")
-    .isString()
-    .withMessage("Descriptionmust be a string")
-    .bail(),
-
   body("description")
     .isString()
     .withMessage("Descriptionmust be a string")

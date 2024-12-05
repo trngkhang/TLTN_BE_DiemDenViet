@@ -13,7 +13,6 @@ const DestinationSchema = new Schema(
         "https://img.freepik.com/free-vector/vietnam-map-touristic-isometric-poster_1284-17336.jpg",
       required: true,
     },
-    introduce: { type: String, default: "Đang cập nhật", required: true },
     description: { type: String, default: "Đang cập nhật", required: true },
     address: {
       street: { type: String }, // Đảm bảo `street` có giá trị

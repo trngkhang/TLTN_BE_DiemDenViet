@@ -5,8 +5,7 @@ class DestinationController {
     try {
       const {
         name,
-        image,
-        introduce,
+        image, 
         description,
         address,
         openingTime,
@@ -18,8 +17,7 @@ class DestinationController {
         return res.error(400, "Tên địa điểm đã tồn tại");
       }
       const newDestination = new Destination({
-        name,
-        introduce,
+        name, 
         ...(image && { image }),
         ...(description && { description }),
         ...(address && { address }),
@@ -64,7 +62,6 @@ class DestinationController {
         ...(searchTerm && {
           $or: [
             { name: { $regex: searchTerm, $options: "i" } },
-            { introduce: { $regex: searchTerm, $options: "i" } },
             { description: { $regex: searchTerm, $options: "i" } },
           ],
         }),
@@ -96,8 +93,7 @@ class DestinationController {
       const { id } = req.params;
       const {
         name,
-        image,
-        introduce,
+        image, 
         description,
         address,
         openingTime,
@@ -109,7 +105,6 @@ class DestinationController {
         {
           ...(name && { name }),
           ...(image && { image }),
-          ...(introduce && { introduce }),
           ...(description && { description }),
           ...(address && { address }),
           ...(openingTime && { openingTime }),
