@@ -80,7 +80,11 @@ class AuthController {
 
   static async signout(req, res, next) {
     try {
-      return res.clearCookie("access_token").success("Đăng xuất thành công");
+      return res.clearCookie("access_token", {
+        httpOnly: true,
+        secure: true,   
+        sameSite: "none" 
+      }).success("Đăng xuất thành công");
     } catch (error) {
       next(error);
     }
