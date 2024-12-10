@@ -12,6 +12,7 @@ router.post(
   DistrictController.post
 );
 router.get("/", DistrictController.getAll);
+router.get("/getforselect", DistrictController.getForSelect);
 router.get("/:id", validateId, DistrictController.get);
 router.put(
   "/:id",

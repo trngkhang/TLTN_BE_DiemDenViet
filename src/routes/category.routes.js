@@ -11,8 +11,9 @@ router.post(
   validateName,
   CategoryController.post
 );
-router.get("/", CategoryController.getAll);
+router.get("/getforselect", CategoryController.getForSelect);
 router.get("/:id", validateId, CategoryController.get);
+router.get("/", CategoryController.getAll);
 router.put(
   "/:id",
   AuthMiddleware.verifyAdmin,

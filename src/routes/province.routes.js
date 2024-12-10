@@ -12,6 +12,7 @@ router.post(
   ProvinceController.post
 );
 router.get("/", ProvinceController.getAll);
+router.get("/getforselect", ProvinceController.getForSelect);
 router.get("/:id", validateId, ProvinceController.get);
 router.put(
   "/:id",

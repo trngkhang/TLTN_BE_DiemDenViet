@@ -22,7 +22,7 @@ class CategoryController {
       const sortDirection = req.query.order === "asc" ? 1 : -1;
       const startIndex = parseInt(req.query.startIndex) || 0;
       const limit = parseInt(req.query.limit) || null;
-      
+
       const query = {
         ...(isDeleted !== undefined && { isDeleted: isDeleted === "true" }),
       };
@@ -115,6 +115,17 @@ class CategoryController {
       });
       if (!deletedCategory) return res.error(404, "Không tìm thấy danh mục.");
       return res.success("Danh mục đã bị xóa", null);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async getForSelect(req, res, next) {
+    try {
+      const data = await Category.find({ isDeleted: false }, "name");
+      return res.success("Lấy danh sách danh mục thành công", {
+        data,
+      });
     } catch (error) {
       next(error);
     }

@@ -139,6 +139,21 @@ class SubcategoryController {
       next(error);
     }
   }
+
+  static async getForSelect(req, res, next) {
+    try {
+      const { categoryId } = req.query;
+      const data = await Subcategory.find(
+        { isDeleted: false, categoryId: categoryId },
+        "name"
+      );
+      return res.success("Lấy danh sách danh mục con thành công", {
+        data,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export default SubcategoryController;

@@ -11,6 +11,7 @@ router.post(
   validatePostWard,
   WardController.post
 );
+router.get("/getforselect", WardController.getForSelect);
 router.get("/:id", validateId, WardController.get);
 router.put(
   "/:id",

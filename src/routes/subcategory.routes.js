@@ -14,8 +14,9 @@ router.post(
   validatePostSubcategory,
   SubcategoryController.post
 );
-router.get("/", SubcategoryController.getAll);
+router.get("/getforselect", SubcategoryController.getForSelect);
 router.get("/:id", validateId, SubcategoryController.get);
+router.get("/", SubcategoryController.getAll);
 router.put(
   "/:id",
   AuthMiddleware.verifyAdmin,

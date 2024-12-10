@@ -123,6 +123,17 @@ class ProvinceController {
       next(error);
     }
   }
+
+  static async getForSelect(req, res, next) {
+    try {
+      const data = await Province.find({ isDeleted: false }, "name");
+      return res.success("Lấy danh sách tỉnh thành công", {
+        data,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export default ProvinceController;

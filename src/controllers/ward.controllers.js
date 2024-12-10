@@ -197,6 +197,22 @@ class WardController {
       next(error);
     }
   }
+
+  static async getForSelect(req, res, next) {
+    try {
+      const { districtId } = req.query;
+      const data = await Ward.find(
+        { isDeleted: false, districtId: districtId },
+        "name"
+      );
+      return res.success("Lấy danh sách phường thành công", {
+        data,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
 }
 
 export default WardController;

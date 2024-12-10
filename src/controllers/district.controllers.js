@@ -131,9 +131,24 @@ class DistrictController {
       const deletedDistrict = await District.findByIdAndUpdate(id, {
         isDeleted: true,
       });
-      console.log(deletedDistrict)
+      console.log(deletedDistrict);
       if (!deletedDistrict) return res.error(404, "Không tìm thấy quận huyện");
-      return res.success("Quận huyện đã bị xóa",deletedDistrict);
+      return res.success("Quận huyện đã bị xóa", deletedDistrict);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async getForSelect(req, res, next) {
+    try {
+      const { provinceId } = req.query;
+      const data = await District.find(
+        { isDeleted: false, provinceId: provinceId },
+        "name"
+      );
+      return res.success("Lấy danh sách quận huyện thành công", {
+        data,
+      });
     } catch (error) {
       next(error);
     }
