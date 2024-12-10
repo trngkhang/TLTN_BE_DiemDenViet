@@ -5,7 +5,7 @@ class DestinationController {
     try {
       const {
         name,
-        image, 
+        image,
         description,
         address,
         openingTime,
@@ -17,7 +17,7 @@ class DestinationController {
         return res.error(400, "Tên địa điểm đã tồn tại");
       }
       const newDestination = new Destination({
-        name, 
+        name,
         ...(image && { image }),
         ...(description && { description }),
         ...(address && { address }),
@@ -80,7 +80,7 @@ class DestinationController {
 
       return res.success("Lấy danh sách địa điểm thành công", {
         total,
-        countRes:data.length,
+        countRes: data.length,
         data,
       });
     } catch (error) {
@@ -93,12 +93,13 @@ class DestinationController {
       const { id } = req.params;
       const {
         name,
-        image, 
+        image,
         description,
         address,
         openingTime,
         ticketPrice,
-        category,isDeleted
+        category,
+        isDeleted,
       } = req.body;
       const newDestination = await Destination.findByIdAndUpdate(
         id,
@@ -108,7 +109,8 @@ class DestinationController {
           ...(description && { description }),
           ...(address && { address }),
           ...(openingTime && { openingTime }),
-          ...(ticketPrice && { ticketPrice }),          ...(isDeleted && { isDeleted }),
+          ...(ticketPrice && { ticketPrice }),
+          ...(isDeleted && { isDeleted }),
           ...(category && {
             category: {
               categoryId: category.categoryId,
@@ -170,7 +172,63 @@ class DestinationController {
         isDeleted: true,
       });
       if (!deletedDistrict) return res.error(404, "Không tìm thấy quận huyện");
-      return res.success("Quận huyện đã bị xóa",deletedDistrict);
+      return res.success("Quận huyện đã bị xóa", deletedDistrict);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async search(req, res, next) {
+    try {
+      const {
+        searchTerm,
+        provinceId,
+        districtId,
+        wardId,
+        categoryId,
+        subcategoryId,
+        sortBy,
+      } = req.query;
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 20;
+      const skip = (page - 1) * limit;
+
+      const query = {
+        isDeleted: false,
+        ...(provinceId && { "address.provinceId": provinceId }),
+        ...(districtId && { "address.districtId": districtId }),
+        ...(wardId && { "address.wardId": wardId }),
+        ...(categoryId && { "category.categoryId": categoryId }),
+        ...(subcategoryId && { "category.subcategoryId": subcategoryId }),
+        ...(searchTerm && {
+          $or: [
+            { name: { $regex: searchTerm, $options: "i" } },
+            { description: { $regex: searchTerm, $options: "i" } },
+          ],
+        }),
+      };
+
+      let sortOptions = {};
+      if (sortBy === "views") {
+        sortOptions = { views: -1 };
+      } else if (sortBy === "rating") {
+        sortOptions = { averageRating: -1 };
+      }
+      const [data, total] = await Promise.all([
+        Destination.find(query, "name image ticketPrice views averageRating")
+          .sort(sortOptions)
+          .skip(skip)
+          .limit(limit)
+          .populate("address.provinceId", "name")
+          .populate("address.districtId", "name"),
+        Destination.find(query).countDocuments(),
+      ]);
+
+      return res.success("Lấy danh sách địa điểm thành công", {
+        total,
+        countRes: data.length,
+        data,
+      });
     } catch (error) {
       next(error);
     }

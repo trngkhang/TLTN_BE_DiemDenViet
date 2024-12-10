@@ -53,7 +53,8 @@ const DestinationSchema = new Schema(
         required: true,
       },
     },
-    averageRating: { type: Number, default: 0 },    isDeleted: { type: Boolean, default: false },
+    averageRating: { type: Number, default: 5 },
+    isDeleted: { type: Boolean, default: false },
   },
   { timestamps: true, minimize: false, strict: true }
 );
@@ -64,7 +65,7 @@ DestinationSchema.index({ "address.provinceId": 1 });
 DestinationSchema.index({ "category.categoryId": 1 });
 DestinationSchema.index({ "category.subcategoryId": 1 });
 DestinationSchema.index({ "address.averageRating": 1 });
-DestinationSchema.index({ "isDeleted": 1 });
+DestinationSchema.index({ isDeleted: 1 });
 
 // Middleware kiểm tra tính logic của `openingTime`
 DestinationSchema.pre("save", function (next) {

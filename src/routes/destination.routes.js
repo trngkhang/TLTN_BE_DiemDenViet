@@ -15,6 +15,7 @@ router.post(
   DestinationController.post
 );
 router.get("/", DestinationController.getAll);
+router.get("/search", DestinationController.search);
 router.get("/:id", validateId, DestinationController.get);
 router.get("/:id/update", validateId, DestinationController.getForUpdate);
 router.put(
