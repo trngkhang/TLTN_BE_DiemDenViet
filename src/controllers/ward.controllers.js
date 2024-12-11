@@ -25,9 +25,8 @@ class WardController {
       const { isDeleted, districtId, provinceId } = req.query;
       const sortDirection = req.query.order === "asc" ? 1 : -1;
       const page = parseInt(req.query.page) || 1;
-      const limit = parseInt(req.query.limit) || 20;
-      const skip = (page - 1) * limit;
-      // Build the query object
+      const pageSize = parseInt(req.query.pageSize) || 20;
+      const skip = (page - 1) * pageSize;
       const query = {
         ...(isDeleted !== undefined && { isDeleted: isDeleted === "true" }),
         ...(districtId && {
@@ -36,10 +35,10 @@ class WardController {
       };
       const [data, total] = await Promise.all([
         Ward.aggregate([
-          { $match: query }, // Lọc theo điều kiện isDeleted và districtId
+          { $match: query },
           {
             $lookup: {
-              from: "districts", // Collection tên "districts"
+              from: "districts",
               localField: "districtId",
               foreignField: "_id",
               as: "district",
@@ -50,7 +49,7 @@ class WardController {
           },
           {
             $lookup: {
-              from: "provinces", // Collection tên "provinces"
+              from: "provinces",
               localField: "district.provinceId",
               foreignField: "_id",
               as: "province",
@@ -68,7 +67,7 @@ class WardController {
           },
           {
             $lookup: {
-              from: "destinations", // Collection tên "destinations"
+              from: "destinations",
               localField: "_id",
               foreignField: "address.wardId",
               as: "destinations",
@@ -84,15 +83,15 @@ class WardController {
               destinationCount: { $size: "$destinations" },
             },
           },
-          { $sort: { name: sortDirection } }, // Sắp xếp theo tên
-          { $skip: skip }, // Phân trang: bỏ qua số lượng bản ghi `startIndex`
-          ...(limit ? [{ $limit: limit }] : []),
+          { $sort: { name: sortDirection } },
+          { $skip: skip },
+          { $limit: pageSize },
         ]),
         Ward.aggregate([
-          { $match: query }, // Lọc theo điều kiện isDeleted và districtId
+          { $match: query },
           {
             $lookup: {
-              from: "districts", // Collection tên "districts"
+              from: "districts",
               localField: "districtId",
               foreignField: "_id",
               as: "district",
@@ -103,7 +102,7 @@ class WardController {
           },
           {
             $lookup: {
-              from: "provinces", // Collection tên "provinces"
+              from: "provinces",
               localField: "district.provinceId",
               foreignField: "_id",
               as: "province",
@@ -121,27 +120,18 @@ class WardController {
           },
           {
             $lookup: {
-              from: "destinations", // Collection tên "destinations"
+              from: "destinations",
               localField: "_id",
               foreignField: "address.wardId",
               as: "destinations",
             },
           },
-          {
-            $project: {
-              _id: 1,
-              name: 1,
-              isDeleted: 1,
-              district: { _id: "$district._id", name: "$district.name" },
-              province: { _id: "$province._id", name: "$province.name" },
-              destinationCount: { $size: "$destinations" },
-            },
-          },
+          { $count: "total" },
         ]),
       ]);
 
       return res.success("Lấy danh sách phường thành công", {
-        total: total.length,
+        total: total[0].total,
         countRes: data.length,
         data,
       });
@@ -212,7 +202,6 @@ class WardController {
       next(error);
     }
   }
-
 }
 
 export default WardController;

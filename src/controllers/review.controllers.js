@@ -13,12 +13,13 @@ class ReviewController {
     }
   }
 
-  static async get(req, res, next) {
+  static async getAll(req, res, next) {
     try {
       const { id, destinationId, userId } = req.query;
       const sortDirection = req.query.order === "asc" ? 1 : -1;
-      const startIndex = parseInt(req.query.startIndex) || 0;
-      const limit = parseInt(req.query.limit) || null;
+      const page = parseInt(req.query.page) || 1;
+      const pageSize = parseInt(req.query.pageSize) || 20;
+      const skip = (page - 1) * pageSize;
 
       const query = {
         ...(id && { _id: id }),
@@ -26,23 +27,22 @@ class ReviewController {
         ...(userId && { userId: userId }),
       };
 
-      const totalReviews = await Review.countDocuments(query);
-
-      const reviews = await Review.find(query)
-        .sort({ updateAt: sortDirection })
-        .skip(startIndex)
-        .limit(limit)
-        .populate("userId", "name avatar");
-      const responseReviews = reviews.length;
-
-      const lastMonthReviews = await Review.countDocuments({
-        createdAt: { $gte: CommonUtil.oneMonthAgo() },
-      });
+      const [data, total, lastMonth] = await Promise.all([
+        Review.find(query)
+          .sort({ updateAt: sortDirection })
+          .skip(skip)
+          .limit(pageSize)
+          .populate("userId", "name avatar"),
+        Review.find(query).countDocuments(),
+        Review.countDocuments({
+          createdAt: { $gte: CommonUtil.oneMonthAgo() },
+        }),
+      ]);
       return res.success("Lấy danh sách đánh giá thành công", {
-        totalReviews,
-        responseReviews,
-        reviews,
-        lastMonthReviews,
+        total: total,
+        countRes: data.length,
+        data,
+        lastMonth,
       });
     } catch (error) {
       next(error);

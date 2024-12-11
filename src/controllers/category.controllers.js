@@ -20,53 +20,54 @@ class CategoryController {
     try {
       const { isDeleted } = req.query;
       const sortDirection = req.query.order === "asc" ? 1 : -1;
-      const startIndex = parseInt(req.query.startIndex) || 0;
-      const limit = parseInt(req.query.limit) || null;
-
+      const page = parseInt(req.query.page) || 1;
+      const pageSize = parseInt(req.query.pageSize) || 20;
+      const skip = (page - 1) * pageSize;
       const query = {
         ...(isDeleted !== undefined && { isDeleted: isDeleted === "true" }),
       };
 
-      const categories = await Category.aggregate([
-        { $match: query }, // Lọc theo điều kiện isDeleted nếu có
-        {
-          $lookup: {
-            from: "subcategories", // Tên collection của subcategories
-            localField: "_id",
-            foreignField: "categoryId",
-            as: "subcategories",
+      const [data, total] = await Promise.all([
+        Category.aggregate([
+          { $match: query }, // Lọc theo điều kiện isDeleted nếu có
+          {
+            $lookup: {
+              from: "subcategories", // Tên collection của subcategories
+              localField: "_id",
+              foreignField: "categoryId",
+              as: "subcategories",
+            },
           },
-        },
-        {
-          $lookup: {
-            from: "destinations", // Tên collection của destinations
-            localField: "_id",
-            foreignField: "category.categoryId",
-            as: "destinations",
+          {
+            $lookup: {
+              from: "destinations", // Tên collection của destinations
+              localField: "_id",
+              foreignField: "category.categoryId",
+              as: "destinations",
+            },
           },
-        },
-        {
-          $project: {
-            _id: 1,
-            name: 1,
-            isDeleted: 1,
-            createdAt: 1,
-            updatedAt: 1,
-            subcategoryCount: { $size: "$subcategories" },
-            destinationCount: { $size: "$destinations" },
+          {
+            $project: {
+              _id: 1,
+              name: 1,
+              isDeleted: 1,
+              subcategoryCount: { $size: "$subcategories" },
+              destinationCount: { $size: "$destinations" },
+            },
           },
-        },
-        { $sort: { name: sortDirection } }, // Sắp xếp theo tên
-        { $skip: startIndex }, // Bỏ qua số lượng startIndex
-        ...(limit ? [{ $limit: limit }] : []), // Giới hạn số lượng kết quả trả về
+          { $sort: { name: sortDirection } },
+          { $skip: skip },
+          { $limit: pageSize },
+        ]),
+        Category.aggregate([
+          { $match: query }, // Lọc theo điều kiện isDeleted nếu có
+          { $count: "total" },
+        ]),
       ]);
-
-      const totalCategories = await Category.countDocuments();
-      const responseCategories = categories.length;
       return res.success("Lấy danh sách danh mục thành công", {
-        totalCategories,
-        responseCategories,
-        categories,
+        total: total[0].total,
+        countRes: data.length,
+        data,
       });
     } catch (error) {
       next(error);

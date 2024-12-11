@@ -27,63 +27,63 @@ class DistrictController {
     try {
       const { isDeleted, provinceId } = req.query;
       const sortDirection = req.query.order === "asc" ? 1 : -1;
-      const startIndex = parseInt(req.query.startIndex) || 0;
-      const limit = parseInt(req.query.limit) || null;
+      const page = parseInt(req.query.page) || 1;
+      const pageSize = parseInt(req.query.pageSize) || 20;
+      const skip = (page - 1) * pageSize;
       const query = {
         ...(isDeleted !== undefined && { isDeleted: isDeleted === "true" }),
         ...(provinceId && {
           provinceId: new mongoose.Types.ObjectId(provinceId),
         }),
       };
-      const districts = await District.aggregate([
-        { $match: query }, // Lọc theo điều kiện isDeleted và provinceId nếu có
-        {
-          $lookup: {
-            from: "wards", // Tên collection Ward
-            localField: "_id",
-            foreignField: "districtId",
-            as: "wards",
+      const [data, total] = await Promise.all([
+        District.aggregate([
+          { $match: query }, // Lọc theo điều kiện isDeleted và provinceId nếu có
+          {
+            $lookup: {
+              from: "wards", // Tên collection Ward
+              localField: "_id",
+              foreignField: "districtId",
+              as: "wards",
+            },
           },
-        },
-        {
-          $lookup: {
-            from: "destinations", // Tên collection Destination
-            localField: "_id",
-            foreignField: "address.districtId",
-            as: "destinations",
+          {
+            $lookup: {
+              from: "destinations", // Tên collection Destination
+              localField: "_id",
+              foreignField: "address.districtId",
+              as: "destinations",
+            },
           },
-        },
-        {
-          $lookup: {
-            from: "provinces", // Tên collection Province
-            localField: "provinceId",
-            foreignField: "_id",
-            as: "province",
+          {
+            $lookup: {
+              from: "provinces", // Tên collection Province
+              localField: "provinceId",
+              foreignField: "_id",
+              as: "province",
+            },
           },
-        },
-        {
-          $project: {
-            _id: 1,
-            name: 1,
-            isDeleted: 1,
-            createdAt: 1,
-            updatedAt: 1,
-            province: { $arrayElemAt: ["$province", 0] }, // Chỉ lấy thông tin province đầu tiên
-            wardCount: { $size: "$wards" }, // Đếm số wards
-            destinationCount: { $size: "$destinations" }, // Đếm số destinations
+          {
+            $project: {
+              _id: 1,
+              name: 1,
+              isDeleted: 1,
+              province: { $arrayElemAt: ["$province", 0] },
+              wardCount: { $size: "$wards" },
+              destinationCount: { $size: "$destinations" },
+            },
           },
-        },
-        { $sort: { name: sortDirection } }, // Sắp xếp theo tên
-        ...(limit ? [{ $skip: startIndex }, { $limit: limit }] : []), // Phân trang nếu limit không phải "all"
+          { $sort: { name: sortDirection } },
+          { $skip: skip },
+          { $limit: pageSize },
+        ]),
+        District.aggregate([{ $match: query }, { $count: "total" }]),
       ]);
 
-      const totalDistricts = await District.countDocuments();
-      const responseDistricts = districts.length;
-
       return res.success("Lấy danh sách quận huyện thành công", {
-        totalDistricts,
-        responseDistricts,
-        districts,
+        total: total[0].total,
+        countRes: data.length,
+        data,
       });
     } catch (error) {
       next(error);

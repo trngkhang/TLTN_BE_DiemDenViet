@@ -31,8 +31,9 @@ class SubcategoryController {
     try {
       const { isDeleted, categoryId } = req.query;
       const sortDirection = req.query.order === "asc" ? 1 : -1;
-      const startIndex = parseInt(req.query.startIndex) || 0;
-      const limit = parseInt(req.query.limit) || null;
+      const page = parseInt(req.query.page) || 1;
+      const pageSize = parseInt(req.query.pageSize) || 20;
+      const skip = (page - 1) * pageSize;
 
       const query = {
         ...(isDeleted !== undefined && { isDeleted: isDeleted === "true" }),
@@ -41,46 +42,46 @@ class SubcategoryController {
         }),
       };
 
-      const subcategories = await Subcategory.aggregate([
-        { $match: query }, // Lọc theo điều kiện isDeleted và categoryId
-        {
-          $lookup: {
-            from: "categories", // Kết nối với bảng Category
-            localField: "categoryId",
-            foreignField: "_id",
-            as: "category",
-          },
-        },
-        {
-          $lookup: {
-            from: "destinations", // Kết nối với bảng Destination
-            localField: "_id",
-            foreignField: "category.subcategoryId",
-            as: "destinations",
-          },
-        },
-        {
-          $project: {
-            _id: 1,
-            name: 1,
-            isDeleted: 1,
-            category: {
-              $arrayElemAt: ["$category", 0], // Lấy object category đầu tiên
+      const [data, total] = await Promise.all([
+        Subcategory.aggregate([
+          { $match: query },
+          {
+            $lookup: {
+              from: "categories",
+              localField: "categoryId",
+              foreignField: "_id",
+              as: "category",
             },
-            destinationCount: { $size: "$destinations" }, // Đếm số destination
           },
-        },
-        { $sort: { name: sortDirection } }, // Sắp xếp theo tên
-        { $skip: startIndex }, // Phân trang: bỏ qua số lượng bản ghi `startIndex`
-        ...(limit ? [{ $limit: limit }] : []), // Phân trang: giới hạn số lượng bản ghi
+          {
+            $lookup: {
+              from: "destinations",
+              localField: "_id",
+              foreignField: "category.subcategoryId",
+              as: "destinations",
+            },
+          },
+          {
+            $project: {
+              _id: 1,
+              name: 1,
+              isDeleted: 1,
+              category: {
+                $arrayElemAt: ["$category", 0],
+              },
+              destinationCount: { $size: "$destinations" },
+            },
+          },
+          { $sort: { name: sortDirection } },
+          { $skip: skip },
+          { $limit: pageSize },
+        ]),
+        Subcategory.aggregate([{ $match: query }, { $count: "total" }]),
       ]);
-
-      const totalSubcategories = await Subcategory.countDocuments();
-      const responseSubcategories = subcategories.length;
       return res.success("Lấy danh sách danh mục con thành công", {
-        totalSubcategories,
-        responseSubcategories,
-        subcategories,
+        total: total[0].total,
+        countRes: data.length,
+        data,
       });
     } catch (error) {
       next(error);

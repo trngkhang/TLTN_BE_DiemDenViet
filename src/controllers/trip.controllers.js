@@ -58,29 +58,29 @@ class TripController {
     try {
       const { userId, isDeleted } = req.query;
       const sortDirection = req.query.order === "asc" ? 1 : -1;
-      const startIndex = parseInt(req.query.startIndex) || 0;
-      const limit = parseInt(req.query.limit) || 9;
+      const page = parseInt(req.query.page) || 1;
+      const pageSize = parseInt(req.query.pageSize) || 20;
+      const skip = (page - 1) * pageSize;
       const query = {
         ...(userId && { userId: userId }),
         ...(isDeleted && { isDeleted: isDeleted == "true" }),
       };
-      const trips = await Trip.find(query)
-        .sort({ updateAt: sortDirection })
-        .skip(startIndex)
-        .limit(limit)
-        .populate("userId", "name");
-      const totalTrips = await Trip.countDocuments();
-      const responseTrips = trips.length;
-
-      const lastMonthTrips = await Trip.countDocuments({
-        createdAt: { $gte: CommonUtil.oneMonthAgo() },
-      });
-
+      const [data, total, lastMonth] = await Promise.all([
+        Trip.find(query)
+          .sort({ updateAt: sortDirection })
+          .skip(skip)
+          .limit(pageSize)
+          .populate("userId", "name"),
+        Trip.find(query).countDocuments(),
+        Trip.countDocuments({
+          createdAt: { $gte: CommonUtil.oneMonthAgo() },
+        }),
+      ]);
       return res.success("Lấy danh sách chuyến đi thành công", {
-        totalTrips,
-        responseTrips,
-        trips,
-        lastMonthTrips,
+        total,
+        countRes: data.length,
+        data,
+        lastMonth,
       });
     } catch (error) {
       next(error);

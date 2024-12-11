@@ -23,53 +23,53 @@ class ProvinceController {
     try {
       const { isDeleted } = req.query;
       const sortDirection = req.query.order === "asc" ? 1 : -1;
-      const startIndex = parseInt(req.query.startIndex) || 0;
-      const limit = parseInt(req.query.limit) || null;
+      const page = parseInt(req.query.page) || 1;
+      const pageSize = parseInt(req.query.pageSize) || 20;
+      const skip = (page - 1) * pageSize;
 
       const query = {
         ...(isDeleted !== undefined && { isDeleted: isDeleted === "true" }),
       };
 
-      const provinces = await Province.aggregate([
-        { $match: query }, // Lọc theo điều kiện isDeleted nếu có
-        {
-          $lookup: {
-            from: "districts", // Tên collection District
-            localField: "_id",
-            foreignField: "provinceId",
-            as: "districts",
+      const [data, total] = await Promise.all([
+        Province.aggregate([
+          { $match: query },
+          {
+            $lookup: {
+              from: "districts",
+              localField: "_id",
+              foreignField: "provinceId",
+              as: "districts",
+            },
           },
-        },
-        {
-          $lookup: {
-            from: "destinations", // Tên collection Destination
-            localField: "_id",
-            foreignField: "address.provinceId",
-            as: "destinations",
+          {
+            $lookup: {
+              from: "destinations",
+              localField: "_id",
+              foreignField: "address.provinceId",
+              as: "destinations",
+            },
           },
-        },
-        {
-          $project: {
-            _id: 1,
-            name: 1,
-            isDeleted: 1,
-            createdAt: 1,
-            updatedAt: 1,
-            districtCount: { $size: "$districts" }, // Đếm số Districts
-            destinationCount: { $size: "$destinations" }, // Đếm số Destinations
+          {
+            $project: {
+              _id: 1,
+              name: 1,
+              isDeleted: 1,
+              districtCount: { $size: "$districts" },
+              destinationCount: { $size: "$destinations" },
+            },
           },
-        },
-        { $sort: { name: sortDirection } }, // Sắp xếp theo tên
-        ...(limit ? [{ $skip: startIndex }, { $limit: limit }] : []), // Phân trang nếu limit không phải "all"
+          { $sort: { name: sortDirection } },
+          { $skip: skip },
+          { $limit: pageSize },
+        ]),
+        Province.aggregate([{ $match: query }, { $count: "total" }]),
       ]);
 
-      const totalProvinces = await Province.countDocuments();
-      const responseProvinces = provinces.length;
-
       return res.success("Lấy danh sách tỉnh thành công", {
-        totalProvinces,
-        responseProvinces,
-        provinces,
+        total: total[0].total,
+        countRes: data.length,
+        data,
       });
     } catch (error) {
       next(error);

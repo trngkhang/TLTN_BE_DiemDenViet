@@ -15,7 +15,7 @@ router.post(
   validateReview,
   ReviewController.post
 );
-router.get("/", ReviewController.get);
+router.get("/", ReviewController.getAll);
 router.delete(
   "/:id",
   AuthMiddleware.verifyThisUserOrAdmin,

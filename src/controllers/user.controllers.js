@@ -64,30 +64,28 @@ class UserController {
 
   static async getAll(req, res, next) {
     try {
-      const sortDirection = req.query.order === "asc" ? 1 : -1;
       const { isDeleted } = req.query;
-      const startIndex = parseInt(req.query.startIndex) || 0;
-      const limit = parseInt(req.query.limit) || 9;
+      const page = parseInt(req.query.page) || 1;
+      const pageSize = parseInt(req.query.pageSize) || 20;
+      const skip = (page - 1) * pageSize;
 
       const query = {
         ...(isDeleted && { isDeleted: isDeleted == "true" }),
       };
-      const users = await User.find(query)
-        .sort({ updateAt: sortDirection })
-        .skip(startIndex)
-        .limit(limit);
-      const totalUsers = await User.countDocuments();
-      const responseUsers = users.length;
 
-      const lastMonthUsers = await User.countDocuments({
-        createdAt: { $gte: CommonUtil.oneMonthAgo() },
-      });
+      const [data, total, lastMonth] = await Promise.all([
+        User.find(query).skip(skip).limit(pageSize),
+        User.find(query).countDocuments(),
+        User.countDocuments({
+          createdAt: { $gte: CommonUtil.oneMonthAgo() },
+        }),
+      ]);
 
       return res.success("Lấy danh sách chuyến đi thành công", {
-        totalUsers,
-        responseUsers,
-        users,
-        lastMonthUsers,
+        total,
+        countRes: data.length,
+        data,
+        lastMonth,
       });
     } catch (error) {
       next(error);

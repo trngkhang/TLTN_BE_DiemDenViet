@@ -49,8 +49,8 @@ class DestinationController {
         sortBy,
       } = req.query;
       const page = parseInt(req.query.page) || 1;
-      const limit = parseInt(req.query.limit) || 20;
-      const skip = (page - 1) * limit;
+      const pageSize = parseInt(req.query.pageSize) || 20;
+      const skip = (page - 1) * pageSize;
 
       const query = {
         ...(destinationTypeId && { _id: destinationTypeId }),
@@ -74,7 +74,7 @@ class DestinationController {
         sortOptions = { averageRating: -1 };
       }
       const [data, total] = await Promise.all([
-        Destination.find(query).sort(sortOptions).skip(skip).limit(limit),
+        Destination.find(query).sort(sortOptions).skip(skip).limit(pageSize),
         Destination.find(query).countDocuments(),
       ]);
 
