@@ -14,6 +14,7 @@ const WardSchema = mongoose.Schema(
 );
 
 WardSchema.index({ districtId: 1 });
+WardSchema.index({ isDeleted: 1 });
 
 const Ward = mongoose.model("Ward", WardSchema);
 export default Ward;

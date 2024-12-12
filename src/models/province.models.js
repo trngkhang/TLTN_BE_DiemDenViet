@@ -8,5 +8,7 @@ const ProvinceSchema = mongoose.Schema(
   { timestamps: true, minimize: false, strict: true }
 );
 
+ProvinceSchema.index({ isDeleted: 1 });
+
 const Province = mongoose.model("Province", ProvinceSchema);
 export default Province;

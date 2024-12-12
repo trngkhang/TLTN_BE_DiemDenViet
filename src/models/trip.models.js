@@ -19,5 +19,8 @@ const TripSchema = new mongoose.Schema(
   { timestamps: true, minimize: false, strict: true }
 );
 
+TripSchema.index({ userId: 1 });
+TripSchema.index({ isDeleted: 1 });
+
 const Trip = mongoose.model("Trip", TripSchema);
 export default Trip;

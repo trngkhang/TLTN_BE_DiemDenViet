@@ -266,19 +266,6 @@ export const validateReview = [
   validateRequest,
 ];
 
-export const validateDeleteReview = [
-  body("userId")
-    .not()
-    .isEmpty()
-    .withMessage("User id must not be empty")
-    .bail()
-    .isMongoId()
-    .withMessage("Invalid user id")
-    .bail(),
-
-  validateRequest,
-];
-
 export const validatePutUser = [
   body("avatarr").optional().isURL().withMessage("Avatar must be url").bail(),
 

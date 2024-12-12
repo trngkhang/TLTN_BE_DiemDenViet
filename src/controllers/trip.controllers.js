@@ -57,7 +57,7 @@ class TripController {
   static async getAll(req, res, next) {
     try {
       const { userId, isDeleted } = req.query;
-      const sortDirection = req.query.order === "asc" ? 1 : -1;
+      const sortDirection = parseInt(req.query.order) || 1;
       const page = parseInt(req.query.page) || 1;
       const pageSize = parseInt(req.query.pageSize) || 20;
       const skip = (page - 1) * pageSize;
@@ -67,7 +67,7 @@ class TripController {
       };
       const [data, total, lastMonth] = await Promise.all([
         Trip.find(query)
-          .sort({ updateAt: sortDirection })
+          .sort({ createdAt: sortDirection })
           .skip(skip)
           .limit(pageSize)
           .populate("userId", "name"),

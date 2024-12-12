@@ -14,6 +14,7 @@ const DistrictSchema = mongoose.Schema(
 );
 
 DistrictSchema.index({ provinceId: 1 });
+DistrictSchema.index({ isDeleted: 1 });
 
 const District = mongoose.model("District", DistrictSchema);
 export default District;

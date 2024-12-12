@@ -8,5 +8,7 @@ const CategorySchema = mongoose.Schema(
   { timestamps: true, minimize: false, strict: true }
 );
 
+CategorySchema.index({ isDeleted: 1 });
+
 const Category = mongoose.model("Category", CategorySchema);
 export default Category;

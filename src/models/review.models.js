@@ -23,9 +23,13 @@ const ReviewSchema = mongoose.Schema(
       ref: "Destination",
       required: true,
     },
+    isDeleted: { type: Boolean, default: false },
   },
   { timestamps: true, minimize: false, strict: true }
 );
+
+ReviewSchema.index({ isDeleted: 1 });
+ReviewSchema.index({ destinationId: 1 });
 
 // Middleware pre-save: kiểm tra sự tồn tại của userId và destinationId trước khi lưu
 ReviewSchema.pre("save", function (next) {

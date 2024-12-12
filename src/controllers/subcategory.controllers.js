@@ -30,7 +30,7 @@ class SubcategoryController {
   static async getAll(req, res, next) {
     try {
       const { isDeleted, categoryId } = req.query;
-      const sortDirection = req.query.order === "asc" ? 1 : -1;
+      const sortDirection = parseInt(req.query.order) || 1;
       const page = parseInt(req.query.page) || 1;
       const pageSize = parseInt(req.query.pageSize) || 20;
       const skip = (page - 1) * pageSize;
