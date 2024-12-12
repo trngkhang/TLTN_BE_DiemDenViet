@@ -52,9 +52,9 @@ class UserController {
       return res
         .cookie("access_token", token, {
           expiresIn: "6h",
-          httpOnly: true, // Bảo mật cookie, không truy cập được từ JS
-          secure: true, // Cookie chỉ được gửi qua HTTPS
-          sameSite: "none", // Đảm bảo cookie hoạt động trên các domain khác nhau
+          httpOnly: true,
+          secure: true,
+          sameSite: "none",
         })
         .success("Cập nhật người dùng thành công", rest);
     } catch (error) {
@@ -62,15 +62,44 @@ class UserController {
     }
   }
 
+  static async putByAdmin(req, res, next) {
+    try {
+      const { isAdmin, isDeleted } = req.body;
+      const userId = req.params.id;
+      const updatedFields = {
+        ...(isAdmin && { isAdmin }),
+        ...(isDeleted && { isDeleted }),
+      };
+
+      const updatetedUser = await User.findByIdAndUpdate(
+        userId,
+        updatedFields,
+        { new: true, select: "-password" }
+      );
+      if (!updatetedUser) {
+        return res.error(404, "Không tìm thấy người dùng.");
+      }
+      const { password: pass, ...rest } = updatetedUser._doc;
+
+      return res.success("Cập nhật người dùng thành công", rest);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   static async getAll(req, res, next) {
     try {
-      const { isDeleted } = req.query;
+      const { username, isAdmin, isDeleted } = req.query;
       const page = parseInt(req.query.page) || 1;
       const pageSize = parseInt(req.query.pageSize) || 20;
       const skip = (page - 1) * pageSize;
 
       const query = {
         ...(isDeleted && { isDeleted: isDeleted == "true" }),
+        ...(isAdmin && { isAdmin: isAdmin == "true" }),
+        ...(username && {
+          $or: [{ username: { $regex: username, $options: "i" } }],
+        }),
       };
 
       const [data, total, lastMonth] = await Promise.all([
@@ -87,6 +116,19 @@ class UserController {
         data,
         lastMonth,
       });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async delete(req, res, next) {
+    try {
+      const { id } = req.params;
+      const deletedUer = await User.findByIdAndUpdate(id, {
+        isDeleted: true,
+      });
+      if (!deletedUer) return res.error(404, "Không tìm thấy tài khoản");
+      return res.success("Tài khoản đã bị xóa");
     } catch (error) {
       next(error);
     }
