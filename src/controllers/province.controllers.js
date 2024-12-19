@@ -3,14 +3,14 @@ import Province from "../models/province.models.js";
 class ProvinceController {
   static async post(req, res, next) {
     try {
-      const { name, regionId } = req.body;
+      const { name } = req.body;
 
       const province = await Province.findOne({ name: name });
       if (province) {
         return res.error(400, "Tỉnh đã tồn tại");
       }
 
-      const newProvince = new Province({ name, regionId });
+      const newProvince = new Province({ name });
       const savedProvince = await newProvince.save();
 
       return res.success("Tỉnh đã được tạo thành công", savedProvince);

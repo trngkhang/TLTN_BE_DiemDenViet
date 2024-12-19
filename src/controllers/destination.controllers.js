@@ -39,8 +39,7 @@ class DestinationController {
   static async getAll(req, res, next) {
     try {
       const {
-        searchTerm,
-        destinationTypeId,
+        searchTerm, 
         provinceId,
         districtId,
         wardId,
@@ -53,7 +52,6 @@ class DestinationController {
       const skip = (page - 1) * pageSize;
 
       const query = {
-        ...(destinationTypeId && { _id: destinationTypeId }),
         ...(provinceId && { "address.provinceId": provinceId }),
         ...(districtId && { "address.districtId": districtId }),
         ...(wardId && { "address.wardId": wardId }),
