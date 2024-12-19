@@ -15,7 +15,7 @@ const DestinationSchema = new Schema(
     },
     description: { type: String, default: "Đang cập nhật", required: true },
     address: {
-      street: { type: String }, // Đảm bảo `street` có giá trị
+      street: { type: String }, 
       wardId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Ward",
@@ -29,16 +29,11 @@ const DestinationSchema = new Schema(
         ref: "Province",
       },
     },
-    openingTime: [
-      {
-        day: { type: String, required: true },
-        open: { type: Boolean, default: false },
-        openAllDay: { type: Boolean, default: false },
-        closedAllDay: { type: Boolean, default: false },
-        startTime: { type: String }, // Thêm định dạng giờ nếu cần (ví dụ: HH:MM)
-        endTime: { type: String },
-      },
-    ],
+    openingTime: {
+      type: String,
+      default: "Đang cập nhật",
+      required: true,
+    },
     ticketPrice: { type: String, default: "Đang cập nhật" },
     views: { type: Number, default: 0, min: 0 },
     category: {
@@ -67,17 +62,6 @@ DestinationSchema.index({ "category.subcategoryId": 1 });
 DestinationSchema.index({ "address.averageRating": 1 });
 DestinationSchema.index({ isDeleted: 1 });
 
-// Middleware kiểm tra tính logic của `openingTime`
-DestinationSchema.pre("save", function (next) {
-  this.openingTime.forEach((time) => {
-    if (time.openAllDay && time.closedAllDay) {
-      return next(
-        new Error("`openAllDay` và `closedAllDay` không thể cùng là true.")
-      );
-    }
-  });
-  next();
-});
 
 const Destination = mongoose.model("Destination", DestinationSchema);
 export default Destination;
