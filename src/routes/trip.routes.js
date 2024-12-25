@@ -5,7 +5,8 @@ import AuthMiddleware from "../middlewares/verifyToken.js";
 
 const router = express.Router();
 
-router.post("/", validateGenerateTrip, TripController.generate);
+router.post("/byai", validateGenerateTrip, TripController.generateByAI);
+router.post("/fromdb",  TripController.generateFromDB);
 router.get("/:id", TripController.get);
 router.get("/", TripController.getAll);
 router.delete(

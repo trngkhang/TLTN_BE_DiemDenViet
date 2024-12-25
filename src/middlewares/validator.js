@@ -425,5 +425,10 @@ export const validateGenerateTrip = [
 
   body("budget").not().isEmpty().withMessage("budget must not be empty").bail(),
 
+  body("interest")
+    .isLength({  max: 100 })
+    .withMessage("Name must be less than 50 characters long")
+    .bail(),
+
   validateRequest,
 ];

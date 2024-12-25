@@ -130,8 +130,7 @@ class DistrictController {
       const { id } = req.params;
       const deletedDistrict = await District.findByIdAndUpdate(id, {
         isDeleted: true,
-      });
-      console.log(deletedDistrict);
+      }); 
       if (!deletedDistrict) return res.error(404, "Không tìm thấy quận huyện");
       return res.success("Quận huyện đã bị xóa", deletedDistrict);
     } catch (error) {

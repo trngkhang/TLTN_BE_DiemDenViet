@@ -80,8 +80,7 @@ class ReviewController {
       const deletedReview = await Review.findByIdAndUpdate(id, {
         isDeleted: true,
       });
-      console.log(deletedReview);
-      if (!deletedReview) {
+       if (!deletedReview) {
         return res.error(404, "Không tìm thấy đánh giá");
       }
       return res.success("Đánh giá đã bị xóa");

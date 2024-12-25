@@ -1,0 +1,24 @@
+{
+  hotelOptions: [
+    {
+      name,
+      address,
+      price,
+      rating,
+      description,
+    }
+  ],
+  itinerary: [
+    {
+      day: Ngày 1,
+      plan: [
+        {
+          name,
+          time
+          details,
+          price, 
+        }
+      ]
+    }
+  ]
+}

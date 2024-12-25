@@ -16,6 +16,7 @@ router.post(
 );
 router.get("/", DestinationController.getAll);
 router.get("/search", DestinationController.search);
+router.get("/forTrip", DestinationController.getDestinationForTrip);
 router.get("/:id", validateId, DestinationController.get);
 router.get("/:id/update", validateId, DestinationController.getForUpdate);
 router.put(

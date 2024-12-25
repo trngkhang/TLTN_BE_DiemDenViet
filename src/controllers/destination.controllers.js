@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import Destination from "../models/destination.models.js";
 
 class DestinationController {
@@ -39,7 +40,7 @@ class DestinationController {
   static async getAll(req, res, next) {
     try {
       const {
-        searchTerm, 
+        searchTerm,
         provinceId,
         districtId,
         wardId,
@@ -108,7 +109,7 @@ class DestinationController {
           ...(address && { address }),
           ...(openingTime && { openingTime }),
           ...(ticketPrice && { ticketPrice }),
-          ...(isDeleted && { isDeleted }),
+          ...(isDeleted !== undefined && { isDeleted: isDeleted === "true" }),
           ...(category && {
             category: {
               categoryId: category.categoryId,
@@ -224,6 +225,51 @@ class DestinationController {
 
       return res.success("Lấy danh sách địa điểm thành công", {
         total,
+        countRes: data.length,
+        data,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async getDestinationForTrip(req, res, next) {
+    const { provinceId, districtId } = req.query;
+    try {
+      const query = {
+        ...(provinceId && {
+          "address.provinceId": new mongoose.Types.ObjectId(provinceId),
+        }),
+        ...(districtId && {
+          "address.provinceId": new mongoose.Types.ObjectId(districtId),
+        }),
+        isDeleted: false,
+      };
+      const data = await Destination.aggregate([
+        { $match: query },
+        {
+          $lookup: {
+            from: "subcategories",
+            localField: "category.subcategoryId",
+            foreignField: "_id",
+            as: "subcategoryDetails",
+          },
+        },
+        {
+          $unwind: {
+            path: "$subcategoryDetails",
+            preserveNullAndEmptyArrays: true,
+          },
+        },
+        {
+          $project: {
+            _id: 1,
+            name: 1,
+            category: "$subcategoryDetails.name",
+          },
+        },{$limit:2}
+      ]);
+      return res.success("Lấy danh sách địa điểm thành công", {
         countRes: data.length,
         data,
       });

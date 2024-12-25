@@ -1,37 +1,76 @@
 import Trip from "../models/trip.models.js";
-import { chatSession } from "../services/AIModel.js";
+import { genByAI } from "../services/AImodel/genByAI.js";
+import { genfromDB } from "../services/AImodel/genfromDB.js";
 import CommonUtil from "../utils/CommonUtil.js";
-import { AI_PROMPT } from "../utils/trip.js";
+import { getDestinationForTrip } from "../utils/function/destination.js";
+import { AI_PROMPT, AI_PROMPT_2 } from "../utils/trip.js";
 
 class TripController {
-  static async generate(req, res, next) {
+  static async generateByAI(req, res, next) {
     try {
       const { userId, location, noOfDay, traveler, budget } = req.body;
-      console.log(userId, location, noOfDay, traveler, budget);
-      const FINAL_PROMPT = AI_PROMPT.replace("{location}", location)
+      const interest = req.body.interest || "";
+       const FINAL_PROMPT = AI_PROMPT.replace("{location}", location)
         .replace("{noOfDay}", noOfDay)
         .replace("{noOfDay}", noOfDay)
         .replace("{traveler}", traveler)
-        .replace("{budget}", budget);
-      console.log("Prompt:", FINAL_PROMPT);
-      const result = await chatSession.sendMessage(FINAL_PROMPT);
+        .replace("{budget}", budget)
+        .replace("{interest}", interest);
+       const result = await genByAI.sendMessage(FINAL_PROMPT);
       const tripData = JSON.parse(result?.response?.text());
-      console.log(tripData);
-      const newTrip = new Trip({
+       const newTrip = new Trip({
         userId: userId,
         selection: {
           location: location,
           noOfDay: noOfDay,
           traveler: traveler,
           budget: budget,
+          interest: interest,
         },
+        type: "byAI",
         data: tripData,
       });
       const savedTrip = await newTrip.save();
       return res.success("Chuyến đi đã được tạo thành công", savedTrip);
     } catch (error) {
-      console.log(error.message);
-      next(error);
+       next(error);
+    }
+  }
+
+  static async generateFromDB(req, res, next) {
+     try {
+      const { userId, location, noOfDay, traveler, budget, provinceId } =
+        req.body;
+      const interest = req.body.interest || "";
+      const districtId = req.body.districtId || "";
+ 
+      const dataDes = await getDestinationForTrip(provinceId, districtId);
+       const TextDes = JSON.stringify(dataDes);
+       const FINAL_PROMPT = AI_PROMPT_2.replace("{location}", location)
+        .replace("{noOfDay}", noOfDay)
+        .replace("{traveler}", traveler)
+        .replace("{budget}", budget)
+        .replace("{interest}", interest)
+        .replace("_input", TextDes);
+ 
+      const result = await genfromDB.sendMessage(FINAL_PROMPT);
+      const tripData = JSON.parse(result?.response?.text());
+       const newTrip = new Trip({
+        userId: userId,
+        selection: {
+          location: location,
+          noOfDay: noOfDay,
+          traveler: traveler,
+          budget: budget,
+          interest: interest,
+        },
+        type: "fromDB",
+        data: tripData,
+      });
+      const savedTrip = await newTrip.save();
+      return res.success("Chuyến đi đã được tạo thành công", savedTrip);
+    } catch (error) {
+       next(error);
     }
   }
 
@@ -43,8 +82,7 @@ class TripController {
         _id: id,
         ...(isDeleted && { isDeleted: isDeleted }),
       };
-      console.log(query);
-      const trip = await Trip.find(query);
+       const trip = await Trip.find(query);
       if (trip.length === 0) {
         return res.error(404, "Không tìm thấy chuyến đi");
       }
